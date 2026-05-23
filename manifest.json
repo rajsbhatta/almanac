@@ -3,6 +3,7 @@
   "short_name": "Almanac",
   "description": "A daily literary sanctuary for reading classics, collecting fragments, and writing original prose.",
   "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#fbfbfa",
   "theme_color": "#1e293b",

@@ -29,11 +29,11 @@
         <h1 class="serif-title text-lg font-semibold tracking-wide text-stone-800 text-center sm:text-left">The Scribbler's Almanac</h1>
         <nav class="flex gap-4 text-xs font-semibold tracking-wide uppercase text-stone-400 items-center">
             <button onclick="switchTab('dispensary')" id="tab-dispensary" class="text-amber-700 border-b-2 border-amber-700 pb-1 cursor-pointer transition-all">Dispensary</button>
+            <button onclick="switchTab('history')" id="tab-history" class="hover:text-stone-800 pb-1 cursor-pointer transition-all">Retrospective</button>
             <button onclick="switchTab('anthologia')" id="tab-anthologia" class="hover:text-stone-800 pb-1 cursor-pointer transition-all">Anthologia</button>
             <button onclick="switchTab('atelier')" id="tab-atelier" class="hover:text-stone-800 pb-1 cursor-pointer transition-all">Atelier</button>
             
-            <!-- [UPDATE] New dedicated in-app install icon button (Initially hidden) -->
-            <button id="pwa-install-icon" onclick="triggerInstall()" class="hidden hover:text-amber-700 transition-colors cursor-pointer" title="Add app to device">
+            <button id="pwa-install-icon" onclick="triggerInstall()" class="hidden hover:text-amber-700 transition-colors cursor-pointer">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-amber-600"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
             </button>
         </nav>
@@ -43,11 +43,11 @@
     <main class="flex-grow">
         
         <!-- 1. THE DISPENSARY -->
-        <section id="view-dispensary" class="block space-y-6">
+        <section id="view-dispensary" class="block space-y-6 animate-fade-in">
             <div class="text-center space-y-2 py-4">
-                <span class="text-xs uppercase tracking-widest text-stone-400 font-semibold">Today's Selection</span>
-                <h2 id="story-title" class="literary-text text-3xl font-semibold text-stone-900">...</h2>
-                <p id="story-author" class="text-stone-500 italic text-sm">...</p>
+                <span id="reading-date-label" class="text-xs uppercase tracking-widest text-amber-700 font-semibold">Today's Selection</span>
+                <h2 id="story-title" class="literary-text text-3xl font-semibold text-stone-900">Loading Text...</h2>
+                <p id="story-author" class="text-stone-500 italic text-sm">Please wait while the almanac syncs...</p>
             </div>
             
             <div class="bg-amber-50/60 border border-amber-100 p-3 rounded-lg text-xs text-amber-900 text-center shadow-2xs">
@@ -59,8 +59,19 @@
             </article>
         </section>
 
-        <!-- 2. THE ANTHOLOGIA -->
-        <section id="view-anthologia" class="hidden space-y-6">
+        <!-- [NEW VIEW] 2. THE RETROSPECTIVE (10-DAY HISTORY) -->
+        <section id="view-history" class="hidden space-y-6 animate-fade-in">
+            <div class="border-b border-stone-100 pb-2">
+                <h2 class="serif-title text-base font-semibold text-stone-800 tracking-wide">The Retrospective Ledger</h2>
+                <p class="text-xs text-stone-400 mt-0.5">Missed a entry? Review and read selections from the past 10 days.</p>
+            </div>
+            <div id="history-list" class="grid grid-cols-1 gap-3">
+                <!-- History items populated here -->
+            </div>
+        </section>
+
+        <!-- 3. THE ANTHOLOGIA -->
+        <section id="view-anthologia" class="hidden space-y-6 animate-fade-in">
             <div class="flex justify-between items-center">
                 <h2 class="serif-title text-base font-semibold text-stone-800 tracking-wide">Anthologia Archives</h2>
                 <button onclick="openQuoteModal()" class="bg-stone-800 hover:bg-stone-700 text-white text-[11px] font-medium px-3 py-1.5 rounded-md cursor-pointer transition-all">Add Fragment</button>
@@ -70,8 +81,8 @@
             </div>
         </section>
 
-        <!-- 3. THE ATELIER -->
-        <section id="view-atelier" class="hidden space-y-4">
+        <!-- 4. THE ATELIER -->
+        <section id="view-atelier" class="hidden space-y-4 animate-fade-in">
             <div class="flex justify-between items-center">
                 <h2 class="serif-title text-base font-semibold text-stone-800 tracking-wide">The Atelier Desk</h2>
                 <button onclick="createNewDraft()" class="bg-amber-700 hover:bg-amber-800 text-white text-[11px] font-medium px-3 py-1.5 rounded-md cursor-pointer transition-all">+ New Manuscript</button>
@@ -97,13 +108,13 @@
         </section>
     </main>
 
-    <!-- MOBILE-FRIENDLY POPUP BUTTON FOR EXTRACTED TEXT -->
+    <!-- FLOATING SELECTION INTERCEPTOR -->
     <div id="mobile-clipper" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-stone-900 text-white text-xs font-medium px-4 py-2.5 rounded-full shadow-xl hidden items-center gap-2 z-50 transition-transform active:scale-95 cursor-pointer">
         <span>Clip Selection to Anthologia</span>
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>
     </div>
 
-    <!-- PWA MOBILE & DESKTOP INSTALLATION DIALOG BAR -->
+    <!-- PWA INSTALLATION DIALOG BAR -->
     <div id="install-banner" class="fixed bottom-4 left-4 right-4 md:left-1/2 md:right-auto md:-translate-x-1/2 md:w-full md:max-w-md bg-stone-900 border border-stone-800 text-stone-100 p-4 rounded-xl shadow-2xl hidden flex-col sm:flex-row justify-between items-center gap-3 z-50 animate-scale-up">
         <div class="text-center sm:text-left">
             <h4 class="text-xs font-bold uppercase tracking-wider text-amber-400">Add to Device</h4>
@@ -115,7 +126,7 @@
         </div>
     </div>
 
-    <!-- UTILITIES FOOTER -->
+    <!-- FOOTER -->
     <footer class="mt-16 pt-4 border-t border-stone-200 flex justify-between text-[11px] text-stone-400">
         <span>© The Scribbler's Almanac</span>
         <div class="flex gap-3">
@@ -126,7 +137,7 @@
         </div>
     </footer>
 
-    <!-- LOG DIALOG OVERLAY FRAME -->
+    <!-- MANUAL LOG MODAL -->
     <div id="quote-modal" class="fixed inset-0 bg-stone-950/40 backdrop-blur-xs hidden items-center justify-center p-4 z-50">
         <div class="bg-white rounded-xl p-5 w-full max-w-md space-y-4 shadow-2xl border border-stone-100 animate-scale-up">
             <h3 class="serif-title font-semibold text-stone-800">Log Fragment</h3>
@@ -142,36 +153,15 @@
         </div>
     </div>
 
-    <!-- LOGIC APPLICATION CORE CONTROLLERS -->
+    <!-- ENGINE CONTROLLERS LOGIC -->
     <script>
-        // PUBLIC DOMAIN CURATED STORIES CONTAINER
-        const ALMANAC_LIBRARY = [
-            {
-                id: 1,
-                title: "The Child's Story",
-                author: "Charles Dickens",
-                content: "Once upon a time, a good many years ago, there was a traveller, and he set out upon a journey. It was a magic journey, and was to seem very long when he began it, and very short when he got half way through.\n\nHe travelled along a rather dark path for some little time, without meeting anything, until at last he came to a beautiful child. So he said to the child, 'What do you do here?' And the child said, 'I am always at play. Come and play with me!'\n\nSo, he played with that child, the whole day long, and they were very merry. The sky was so blue, the sun was so bright, the water was so sparkling, the leaves were so green, the flowers were so lovely, and everything was so beautiful."
-            },
-            {
-                id: 2,
-                title: "Where the Mind is Without Fear",
-                author: "Rabindranath Tagore",
-                content: "Where the mind is without fear and the head is held high;\nWhere knowledge is free;\nWhere the world has not been broken up into fragments by narrow domestic walls;\nWhere words come out from the depth of truth;\nWhere tireless striving stretches its arms towards perfection;\nWhere the clear stream of reason has not lost its way into the dreary desert sand of dead habit;\nWhere the mind is led forward by thee into ever-widening thought and action;\nInto that heaven of freedom, my Father, let my country awake."
-            },
-            {
-                id: 3,
-                title: "The Tell-Tale Heart (Excerpt)",
-                author: "Edgar Allan Poe",
-                content: "TRUE!—nervous—very, very dreadfully nervous I had been and am; but why will you say that I am mad? The disease had sharpened my senses—not destroyed—not dulled them. Above all was the sense of hearing acute. I heard all things in the heaven and in the earth. I heard many things in hell. How, then, am I mad? Hearken! and observe how healthily—how calmly I can tell you the whole story."
-            }
-        ];
-
+        let globalLibrary = [];
         let currentPieceId = null;
         let activeSelectedText = "";
-        let deferredPrompt = null; // Defined here to be accessed by installer functions
+        let deferredPrompt = null;
 
         window.addEventListener('DOMContentLoaded', () => {
-            initDailyReading();
+            loadLibraryData();
             renderCommonplace();
             renderDrafts();
             setupCrossPlatformSelection();
@@ -180,32 +170,111 @@
 
         // 1. DYNAMIC COMPONENT TAB MANAGER
         function switchTab(tabId) {
-            ['dispensary', 'anthologia', 'atelier'].forEach(id => {
+            ['dispensary', 'history', 'anthologia', 'atelier'].forEach(id => {
                 document.getElementById(`view-${id}`).classList.add('hidden');
                 document.getElementById(`tab-${id}`).className = "hover:text-stone-800 pb-1 cursor-pointer transition-all";
             });
             document.getElementById(`view-${tabId}`).classList.remove('hidden');
             document.getElementById(`tab-${tabId}`).className = "text-amber-700 border-b-2 border-amber-700 pb-1 cursor-pointer transition-all";
+            
+            if(tabId === 'history') { renderRetrospectiveList(); }
         }
 
-        // 2. TIMELOCK CONTENT RETRIEVAL 
-        function initDailyReading() {
-            const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 1)) / 86400000);
-            const selectedStory = ALMANAC_LIBRARY[dayOfYear % ALMANAC_LIBRARY.length];
+        // 2. EXTERNAL MANIFEST LOADER & SERIALIZER LOGIC
+        function loadLibraryData() {
+            fetch('library.json')
+                .then(response => {
+                    if (!response.ok) throw new Error("JSON Fetch missing");
+                    return response.json();
+                })
+                .then(data => {
+                    globalLibrary = data;
+                    buildDailyAlmanacDisplay();
+                })
+                .catch(err => {
+                    console.error("Local library payload fell back to fallback core state:", err);
+                    document.getElementById('story-title').innerText = "Database File Missing";
+                    document.getElementById('story-author').innerText = "Configuration Needed";
+                    document.getElementById('story-body').innerText = "Please ensure your library.json file is added directly to your main repository level on GitHub.";
+                });
+        }
+
+        // Calculates day index sequence for absolute tracking 
+        function getAbsoluteDayIndex(dateObj) {
+            return Math.floor(dateObj.getTime() / (1000 * 60 * 60 * 24));
+        }
+
+        function buildDailyAlmanacDisplay(targetDate = new Date(), isReviewingHistory = false) {
+            if (globalLibrary.length === 0) return;
             
-            if (!selectedStory) { console.error("Library index mismatch."); return; }
+            const targetDayIndex = getAbsoluteDayIndex(targetDate);
+            // Maps the day cleanly across array lengths automatically 
+            const selectedStory = globalLibrary[targetDayIndex % globalLibrary.length];
+
+            // Injects text cleanly into screen interfaces
             document.getElementById('story-title').innerText = selectedStory.title;
             document.getElementById('story-author').innerText = `by ${selectedStory.author}`;
             document.getElementById('story-body').innerText = selectedStory.content;
+            
             document.getElementById('story-body').dataset.storyTitle = selectedStory.title;
             document.getElementById('story-body').dataset.storyAuthor = selectedStory.author;
+
+            const labelNode = document.getElementById('reading-date-label');
+            if(isReviewingHistory) {
+                labelNode.innerText = `Retrospective View: ${targetDate.toLocaleDateString(undefined, {month: 'short', day: 'numeric'})}`;
+                labelNode.classList.replace('text-amber-700', 'text-stone-500');
+            } else {
+                labelNode.innerText = "Today's Selection";
+                labelNode.classList.replace('text-stone-500', 'text-amber-700');
+            }
         }
 
-        // 3. ANDROID AND DESKTOP COMPATIBLE CAPTURE INTERCEPTOR 
+        // 3. RETROSPECTIVE RETRIEVAL ENGINE (SLIDING 10 DAYS LOOKBACK)
+        function renderRetrospectiveList() {
+            const container = document.getElementById('history-list');
+            let htmlBuffer = "";
+            const today = new Date();
+
+            // Iterate backward matching exactly 10 historical days
+            for(let i = 0; i < 10; i++) {
+                const targetPastDate = new Date();
+                targetPastDate.setDate(today.getDate() - i);
+
+                const pastDayIndex = getAbsoluteDayIndex(targetPastDate);
+                const historicStory = globalLibrary[pastDayIndex % globalLibrary.length];
+
+                if(!historicStory) continue;
+
+                const dateLabelString = i === 0 ? "Today" : targetPastDate.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+                
+                // Excerpt slice formatting
+                const excerptText = historicStory.content.substring(0, 110) + "...";
+
+                htmlBuffer += `
+                    <div onclick="viewHistoricalDay(${targetPastDate.getTime()})" class="bg-white border border-stone-200/70 p-4 rounded-xl flex justify-between items-center hover:border-amber-300 transition-all cursor-pointer shadow-2xs group">
+                        <div class="space-y-1 pr-2">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-amber-800 bg-amber-50 px-2 py-0.5 rounded">${dateLabelString}</span>
+                            <h3 class="font-medium text-stone-800 text-sm group-hover:text-amber-900 transition-colors mt-1">${historicStory.title}</h3>
+                            <p class="text-xs text-stone-400 italic">${excerptText}</p>
+                        </div>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-stone-300 group-hover:text-amber-700 w-4 h-4 shrink-0 transition-colors"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    </div>
+                `;
+            }
+            container.innerHTML = htmlBuffer;
+        }
+
+        function viewHistoricalDay(timestamp) {
+            const targetDate = new Date(timestamp);
+            buildDailyAlmanacDisplay(targetDate, true);
+            switchTab('dispensary');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // 4. ANDROID AND DESKTOP COMPATIBLE CAPTURE INTERCEPTOR 
         function setupCrossPlatformSelection() {
             const clipperButton = document.getElementById('mobile-clipper');
 
-            // Listen directly to global document selections to seamlessly hook on Android system text engines
             document.addEventListener('selectionchange', () => {
                 const selection = window.getSelection();
                 const selectedText = selection.toString().trim();
@@ -213,10 +282,8 @@
 
                 if (selectedText.length > 4 && container.contains(selection.anchorNode)) {
                     activeSelectedText = selectedText;
-                    // Position and surface floating anchor button interface
                     clipperButton.classList.replace('hidden', 'flex');
                 } else {
-                    // Delay dropping selection cleanly to prevent collision with tap dynamics
                     setTimeout(() => {
                         if (window.getSelection().toString().trim().length === 0) {
                             clipperButton.classList.replace('flex', 'hidden');
@@ -225,7 +292,6 @@
                 }
             });
 
-            // Action call when clicking execution button
             clipperButton.addEventListener('click', (e) => {
                 e.preventDefault(); e.stopPropagation();
                 if (activeSelectedText) {
@@ -233,7 +299,6 @@
                     const source = document.getElementById('story-body').dataset.storyTitle;
                     saveQuote(activeSelectedText, author, source);
                     
-                    // Visual validation toast feedback loop
                     clipperButton.innerHTML = `Fragment Clipped! ✓`;
                     setTimeout(() => {
                         clipperButton.innerHTML = `<span>Clip Selection to Anthologia</span><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>`;
@@ -246,7 +311,7 @@
             });
         }
 
-        // 4. ANTHOLOGIA DATABASE SYSTEM
+        // 5. ANTHOLOGIA DATABASE SYSTEM
         function saveQuote(text, author, source) {
             let quotes = JSON.parse(localStorage.getItem('almanac_quotes') || '[]');
             quotes.unshift({ id: Date.now(), text, author: author || 'Unknown', source: source || 'Handcrafted Entry' });
@@ -297,7 +362,7 @@
             closeQuoteModal();
         }
 
-        // 5. ATELIER DRAFT WRITING MACHINE
+        // 6. ATELIER DRAFT WRITING MACHINE
         function createNewDraft() {
             let drafts = JSON.parse(localStorage.getItem('almanac_drafts') || '[]');
             const newPiece = { id: Date.now(), title: '', content: '', updated: Date.now() };
@@ -372,7 +437,7 @@
             }
         }
 
-        // 6. BACKUP FILE MANAGEMENT
+        // 7. BACKUP FILE MANAGEMENT
         function exportBackup() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({
                 quotes: JSON.parse(localStorage.getItem('almanac_quotes') || '[]'),
@@ -385,47 +450,23 @@
             downloadAnchor.click(); downloadAnchor.remove();
         }
 
-        function importBackup(event) {
-            const file = event.target.files[0]; if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const parsed = JSON.parse(e.target.result);
-                    if(parsed.quotes) localStorage.setItem('almanac_quotes', JSON.stringify(parsed.quotes));
-                    if(parsed.drafts) localStorage.setItem('almanac_drafts', JSON.stringify(parsed.drafts));
-                    alert("Data elements appended successfully."); renderCommonplace(); renderDrafts();
-                } catch(err) { alert("Failure parsing validation tokens."); }
-            };
-            reader.readAsText(file);
-        }
-
-        // 7. [UPDATE] REFINED PWA INSTALLED CAPABILITY LAYER
+        // 8. PWA SERVICE DESIGN LOGIC 
         function setupPWAInstallTracking() {
             const installBanner = document.getElementById('install-banner');
             const installIcon = document.getElementById('pwa-install-icon');
-
-            // [CRITICAL] Check if this user previously installed the app successfully
             const hasInstalled = localStorage.getItem('almanac_app_installed') === 'true';
             
             window.addEventListener('beforeinstallprompt', (e) => {
-                // Intercept automatic prompt sequences
-                e.preventDefault();
-                deferredPrompt = e;
-
-                // [UPDATE] Do not prompt users who have already confirmed installation on this device
+                e.preventDefault(); deferredPrompt = e;
                 if (!hasInstalled) {
-                    // Surface manual app installation visual notices
                     installBanner.classList.replace('hidden', 'flex');
                     installIcon.classList.remove('hidden');
                 }
             });
 
-            // [CRITICAL UPDATE] Catches the moment user confirms installation native dialog successfully
             window.addEventListener('appinstalled', () => {
-                // Permanently hide installation prompts and set preference flag
                 hideInstallationUI();
                 localStorage.setItem('almanac_app_installed', 'true');
-                console.log('Installation confirmed and logged ✓');
                 deferredPrompt = null;
             });
         }
@@ -436,45 +477,24 @@
         }
 
         function triggerInstall() {
-            if (!deferredPrompt) {
-                console.error("Installation prompt token lost.");
-                // User may need to use browser native menus if token expired
-                hideInstallationUI();
-                return;
-            }
-            // Temporarily hide our UI to show native prompt cleanly
+            if (!deferredPrompt) { hideInstallationUI(); return; }
             hideInstallationUI();
             deferredPrompt.prompt();
-            
-            deferredPrompt.userChoice.then((choiceResult) => {
-                if (choiceResult.outcome === 'accepted') {
-                    // Logic is handled globally by 'appinstalled' listener now, but log for debug
-                    console.log('Accepted via prompt interaction.');
-                } else {
-                    console.log('Install prompt dismissed.');
-                    // Optionally unhide UI after a delay, but best practice is not to annoy
-                }
-                deferredPrompt = null; // Token can only be used once
-            });
+            deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
         }
 
-        function dismissInstall() {
-            hideInstallationUI();
-            // Best practice: respect user dismissal and don't re-prompt aggressively
-            console.log("Install prompt dismissed by user.");
-        }
+        function dismissInstall() { hideInstallationUI(); }
     </script>
 
-    <!-- REAL PHYSICAL SERVICE WORKER REGISTRATION REGISTER -->
+    <!-- SERVICE WORKER INTERFACES -->
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
-                    .then(reg => console.log('Almanac Engine Scope Bound ✓', reg.scope))
+                const repositoryPath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
+                navigator.serviceWorker.register(repositoryPath + 'sw.js')
                     .catch(err => console.error('Registration failed:', err));
             });
         }
     </script>
-
 </body>
 </html>

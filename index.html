@@ -425,28 +425,15 @@
         }
     </script>
 
-    <!-- INLINE AUTO-CONFIG SYSTEM FOR PWA STANDALONE CAPABILITIES -->
+    <!-- REAL PHYSICAL SERVICE WORKER REGISTRATION REGISTER -->
     <script>
         if ('serviceWorker' in navigator) {
-            const swCode = `
-                const CACHE_NAME = 'almanac-engine-v2';
-                const IMPORTS = [
-                    './',
-                    './index.html',
-                    './manifest.json',
-                    'https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4'
-                ];
-                self.addEventListener('install', e => {
-                    e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(IMPORTS)));
-                });
-                self.addEventListener('fetch', e => {
-                    e.respondWith(caches.match(e.request).then(response => response || fetch(e.request)));
-                });
-            `;
-            const blob = new Blob([swCode], { type: 'application/javascript' });
-            const swUrl = URL.createObjectURL(blob);
-            navigator.serviceWorker.register(swUrl).catch(err => console.log("Sandbox config pass", err));
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('The Scribbler\'s Almanac Engine Active ✓', reg.scope))
+                    .catch(err => console.error('Registration failed: ', err));
+            });
         }
-    </script>
+    </script>    
 </body>
 </html>

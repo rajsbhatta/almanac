@@ -469,12 +469,12 @@
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                // [CRITICAL UPDATE] Added explicit scope definition to match start_url pattern
-                navigator.serviceWorker.register('./sw.js', { scope: './' })
+                navigator.serviceWorker.register('sw.js')
                     .then(reg => console.log('Almanac Engine Scope Bound ✓', reg.scope))
                     .catch(err => console.error('Registration failed:', err));
             });
         }
     </script>
+
 </body>
 </html>

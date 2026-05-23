@@ -1,0 +1,22 @@
+{
+  "name": "The Scribbler's Almanac",
+  "short_name": "Almanac",
+  "description": "A daily literary sanctuary for reading classics, collecting fragments, and writing original prose.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#fbfbfa",
+  "theme_color": "#1e293b",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "https://img.icons8.com/fluency-solid/192/focal-length.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "https://img.icons8.com/fluency-solid/512/focal-length.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]
+}

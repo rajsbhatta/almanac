@@ -16,6 +16,10 @@
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #fbfbfa; color: #2d2d2a; -webkit-tap-highlight-color: transparent; }
         .serif-title { font-family: 'Cinzel', serif; }
         .literary-text { font-family: 'Playfair Display', serif; line-height: 1.8; }
+        @keyframes fade-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fade-in 0.4s ease-out; }
+        @keyframes scale-up { from { opacity: 0; transform: scale(0.9) translateY(30px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        .animate-scale-up { animation: scale-up 0.3s ease-out; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col max-w-2xl mx-auto px-4 py-6 selection:bg-amber-200 relative pb-24">
@@ -23,10 +27,15 @@
     <!-- Header Navigation -->
     <header class="flex flex-col sm:flex-row justify-between items-center border-b border-stone-200 pb-4 mb-6 gap-3">
         <h1 class="serif-title text-lg font-semibold tracking-wide text-stone-800 text-center sm:text-left">The Scribbler's Almanac</h1>
-        <nav class="flex gap-4 text-xs font-semibold tracking-wide uppercase text-stone-400">
+        <nav class="flex gap-4 text-xs font-semibold tracking-wide uppercase text-stone-400 items-center">
             <button onclick="switchTab('dispensary')" id="tab-dispensary" class="text-amber-700 border-b-2 border-amber-700 pb-1 cursor-pointer transition-all">Dispensary</button>
             <button onclick="switchTab('anthologia')" id="tab-anthologia" class="hover:text-stone-800 pb-1 cursor-pointer transition-all">Anthologia</button>
             <button onclick="switchTab('atelier')" id="tab-atelier" class="hover:text-stone-800 pb-1 cursor-pointer transition-all">Atelier</button>
+            
+            <!-- [UPDATE] New dedicated in-app install icon button (Initially hidden) -->
+            <button id="pwa-install-icon" onclick="triggerInstall()" class="hidden hover:text-amber-700 transition-colors cursor-pointer" title="Add app to device">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-amber-600"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            </button>
         </nav>
     </header>
 
@@ -95,14 +104,14 @@
     </div>
 
     <!-- PWA MOBILE & DESKTOP INSTALLATION DIALOG BAR -->
-    <div id="install-banner" class="fixed bottom-4 left-4 right-4 md:left-1/2 md:right-auto md:-translate-x-1/2 md:w-full md:max-w-md bg-stone-900 border border-stone-800 text-stone-100 p-4 rounded-xl shadow-2xl hidden flex-col sm:flex-row justify-between items-center gap-3 z-50">
+    <div id="install-banner" class="fixed bottom-4 left-4 right-4 md:left-1/2 md:right-auto md:-translate-x-1/2 md:w-full md:max-w-md bg-stone-900 border border-stone-800 text-stone-100 p-4 rounded-xl shadow-2xl hidden flex-col sm:flex-row justify-between items-center gap-3 z-50 animate-scale-up">
         <div class="text-center sm:text-left">
-            <h4 class="text-xs font-bold uppercase tracking-wider text-amber-400">App Installation Available</h4>
-            <p class="text-xs text-stone-300 mt-0.5">Add The Scribbler's Almanac directly to your home screen or desktop apps menu.</p>
+            <h4 class="text-xs font-bold uppercase tracking-wider text-amber-400">Add to Device</h4>
+            <p class="text-xs text-stone-300 mt-0.5">Install The Scribbler's Almanac for direct access from your apps menu.</p>
         </div>
         <div class="flex gap-2 w-full sm:w-auto shrink-0">
-            <button onclick="dismissInstall()" class="flex-1 sm:flex-initial text-[11px] text-stone-400 hover:text-stone-100 font-medium px-3 py-1.5 rounded-md border border-stone-700 cursor-pointer">Ignore</button>
-            <button onclick="triggerInstall()" class="flex-1 sm:flex-initial text-[11px] bg-amber-600 hover:bg-amber-700 text-white font-semibold px-3 py-1.5 rounded-md cursor-pointer shadow-xs">Install App</button>
+            <button onclick="dismissInstall()" class="flex-1 sm:flex-initial text-[11px] text-stone-400 hover:text-stone-100 font-medium px-3 py-1.5 rounded-md border border-stone-700 cursor-pointer">Skip</button>
+            <button onclick="triggerInstall()" class="flex-1 sm:flex-initial text-[11px] bg-amber-600 hover:bg-amber-700 text-white font-semibold px-3 py-1.5 rounded-md cursor-pointer shadow-xs">Install</button>
         </div>
     </div>
 
@@ -159,7 +168,7 @@
 
         let currentPieceId = null;
         let activeSelectedText = "";
-        let deferredPrompt = null;
+        let deferredPrompt = null; // Defined here to be accessed by installer functions
 
         window.addEventListener('DOMContentLoaded', () => {
             initDailyReading();
@@ -184,6 +193,7 @@
             const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 1)) / 86400000);
             const selectedStory = ALMANAC_LIBRARY[dayOfYear % ALMANAC_LIBRARY.length];
             
+            if (!selectedStory) { console.error("Library index mismatch."); return; }
             document.getElementById('story-title').innerText = selectedStory.title;
             document.getElementById('story-author').innerText = `by ${selectedStory.author}`;
             document.getElementById('story-body').innerText = selectedStory.content;
@@ -217,15 +227,14 @@
 
             // Action call when clicking execution button
             clipperButton.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
+                e.preventDefault(); e.stopPropagation();
                 if (activeSelectedText) {
                     const author = document.getElementById('story-body').dataset.storyAuthor;
                     const source = document.getElementById('story-body').dataset.storyTitle;
                     saveQuote(activeSelectedText, author, source);
                     
                     // Visual validation toast feedback loop
-                    clipperButton.innerText = "Fragment Clipped ✓";
+                    clipperButton.innerHTML = `Fragment Clipped! ✓`;
                     setTimeout(() => {
                         clipperButton.innerHTML = `<span>Clip Selection to Anthologia</span><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>`;
                         clipperButton.classList.replace('flex', 'hidden');
@@ -373,55 +382,86 @@
             downloadAnchor.setAttribute("href", dataStr);
             downloadAnchor.setAttribute("download", `almanac_ledger_${new Date().toISOString().slice(0,10)}.json`);
             document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
+            downloadAnchor.click(); downloadAnchor.remove();
         }
 
         function importBackup(event) {
-            const file = event.target.files[0];
-            if (!file) return;
+            const file = event.target.files[0]; if (!file) return;
             const reader = new FileReader();
             reader.onload = function(e) {
                 try {
                     const parsed = JSON.parse(e.target.result);
                     if(parsed.quotes) localStorage.setItem('almanac_quotes', JSON.stringify(parsed.quotes));
                     if(parsed.drafts) localStorage.setItem('almanac_drafts', JSON.stringify(parsed.drafts));
-                    alert("Data elements appended successfully.");
-                    renderCommonplace();
-                    renderDrafts();
-                } catch(err) {
-                    alert("Failure parsing validation tokens.");
-                }
+                    alert("Data elements appended successfully."); renderCommonplace(); renderDrafts();
+                } catch(err) { alert("Failure parsing validation tokens."); }
             };
             reader.readAsText(file);
         }
 
-        // 7. PWA INSTALLED CAPABILITY LAYER
+        // 7. [UPDATE] REFINED PWA INSTALLED CAPABILITY LAYER
         function setupPWAInstallTracking() {
+            const installBanner = document.getElementById('install-banner');
+            const installIcon = document.getElementById('pwa-install-icon');
+
+            // [CRITICAL] Check if this user previously installed the app successfully
+            const hasInstalled = localStorage.getItem('almanac_app_installed') === 'true';
+            
             window.addEventListener('beforeinstallprompt', (e) => {
-                // Intercept automatic prompt tracking sequences
+                // Intercept automatic prompt sequences
                 e.preventDefault();
                 deferredPrompt = e;
-                // Reveal manual app installation visual notice
-                document.getElementById('install-banner').classList.replace('hidden', 'flex');
+
+                // [UPDATE] Do not prompt users who have already confirmed installation on this device
+                if (!hasInstalled) {
+                    // Surface manual app installation visual notices
+                    installBanner.classList.replace('hidden', 'flex');
+                    installIcon.classList.remove('hidden');
+                }
             });
 
-            // Catch cases where users successfully installed via alternate navigation nodes
+            // [CRITICAL UPDATE] Catches the moment user confirms installation native dialog successfully
             window.addEventListener('appinstalled', () => {
-                document.getElementById('install-banner').classList.replace('flex', 'hidden');
+                // Permanently hide installation prompts and set preference flag
+                hideInstallationUI();
+                localStorage.setItem('almanac_app_installed', 'true');
+                console.log('Installation confirmed and logged ✓');
                 deferredPrompt = null;
             });
         }
 
-        function triggerInstall() {
-            if (!deferredPrompt) return;
+        function hideInstallationUI() {
             document.getElementById('install-banner').classList.replace('flex', 'hidden');
+            document.getElementById('pwa-install-icon').classList.add('hidden');
+        }
+
+        function triggerInstall() {
+            if (!deferredPrompt) {
+                console.error("Installation prompt token lost.");
+                // User may need to use browser native menus if token expired
+                hideInstallationUI();
+                return;
+            }
+            // Temporarily hide our UI to show native prompt cleanly
+            hideInstallationUI();
             deferredPrompt.prompt();
-            deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
+            
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    // Logic is handled globally by 'appinstalled' listener now, but log for debug
+                    console.log('Accepted via prompt interaction.');
+                } else {
+                    console.log('Install prompt dismissed.');
+                    // Optionally unhide UI after a delay, but best practice is not to annoy
+                }
+                deferredPrompt = null; // Token can only be used once
+            });
         }
 
         function dismissInstall() {
-            document.getElementById('install-banner').classList.replace('flex', 'hidden');
+            hideInstallationUI();
+            // Best practice: respect user dismissal and don't re-prompt aggressively
+            console.log("Install prompt dismissed by user.");
         }
     </script>
 
@@ -429,11 +469,12 @@
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('The Scribbler\'s Almanac Engine Active ✓', reg.scope))
-                    .catch(err => console.error('Registration failed: ', err));
+                // [CRITICAL UPDATE] Added explicit scope definition to match start_url pattern
+                navigator.serviceWorker.register('./sw.js', { scope: './' })
+                    .then(reg => console.log('Almanac Engine Scope Bound ✓', reg.scope))
+                    .catch(err => console.error('Registration failed:', err));
             });
         }
-    </script>    
+    </script>
 </body>
 </html>

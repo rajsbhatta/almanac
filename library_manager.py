@@ -1,4 +1,5 @@
 import json
+import os
 import re
 import requests
 
@@ -45,18 +46,26 @@ def clean_gutenberg_text(raw_text):
 
 
 class OnlineLibraryManager:
-    def __init__(self, config_path="library.json"):
-        self.config_path = config_path
+    def __init__(self, config_filename="library.json"):
+        self.config_filename = config_filename
         self.config = self.load_config()
         self.api_config = self.config.get("api_configuration", {})
         
     def load_config(self):
-        """Loads the library configuration file containing target IDs."""
+        """Loads the library configuration file using a foolproof absolute path."""
+        # Find the exact directory where library_manager.py is saved
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        
+        # Merge that directory path with the config filename
+        absolute_config_path = os.path.join(script_dir, self.config_filename)
+        
         try:
-            with open(self.config_path, "r", encoding="utf-8") as file:
+            with open(absolute_config_path, "r", encoding="utf-8") as file:
                 return json.load(file)
         except FileNotFoundError:
-            print(f"Error: {self.config_path} file not found. Make sure it is in the same folder!")
+            print(f"\n[ERROR] Could not find the configuration file.")
+            print(f"Expected it at: {absolute_config_path}")
+            print("Please confirm that 'library.json' is spelled correctly and sits in that exact folder.")
             return {}
 
     def fetch_featured_stories(self):
@@ -102,33 +111,35 @@ class OnlineLibraryManager:
 
 # --- TESTING THE COMPLETE CONNECTION WORKFLOW ---
 if __name__ == "__main__":
-    # Make sure you have run: pip install requests
+    # Ensure you have run: pip install requests
     
     # 1. Initialize the system
     library = OnlineLibraryManager()
 
-    print("Connecting to Project Gutenberg via Gutendex API...")
-    featured_books = library.fetch_featured_stories()
+    # Only attempt to fetch if config successfully loaded target IDs
+    if library.config.get("featured_story_ids"):
+        print("Connecting to Project Gutenberg via Gutendex API...")
+        featured_books = library.fetch_featured_stories()
 
-    # 2. Display the live online catalog to the screen
-    print("\n--- Available Public Library Stories ---")
-    if not featured_books:
-        print("Could not retrieve catalog. Check your internet connection or library.json.")
-    else:
-        for index, book in enumerate(featured_books):
-            author_name = book['authors'][0]['name'] if book['authors'] else 'Unknown Author'
-            print(f"[{index}] {book['title']} by {author_name}")
+        # 2. Display the live online catalog to the screen
+        print("\n--- Available Public Library Stories ---")
+        if not featured_books:
+            print("Could not retrieve catalog. Check your internet connection.")
+        else:
+            for index, book in enumerate(featured_books):
+                author_name = book['authors'][0]['name'] if book['authors'] else 'Unknown Author'
+                print(f"[{index}] {book['title']} by {author_name}")
 
-        # 3. Choose the first book from the downloaded list to read
-        selected_index = 0 
-        target_book = featured_books[selected_index]
-        
-        # Grab the text/plain link from the formats block
-        formats = target_book.get("formats", {})
-        text_link = formats.get("text/plain; charset=utf-8") or formats.get("text/plain")
-        
-        print(f"\nDownloading and cleaning text for: '{target_book['title']}'...")
-        story_content = library.get_story_content(text_link)
-        
-        print("\n--- Cleaned Story Sample (First 400 Characters) ---")
-        print(story_content[:400] + "\n...")
+            # 3. Choose the first book from the downloaded list to read
+            selected_index = 0 
+            target_book = featured_books[selected_index]
+            
+            # Grab the text/plain link from the formats block
+            formats = target_book.get("formats", {})
+            text_link = formats.get("text/plain; charset=utf-8") or formats.get("text/plain")
+            
+            print(f"\nDownloading and cleaning text for: '{target_book['title']}'...")
+            story_content = library.get_story_content(text_link)
+            
+            print("\n--- Cleaned Story Sample (First 400 Characters) ---")
+            print(story_content[:400] + "\n...")

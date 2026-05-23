@@ -3,497 +3,171 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Scribbler's Almanac</title>
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#1e293b">
-    <!-- Tailwind CSS for clean layout -->
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <!-- Google Fonts for premium literary typography -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <title>Public Library Reader</title>
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #fbfbfa; color: #2d2d2a; -webkit-tap-highlight-color: transparent; }
-        .serif-title { font-family: 'Cinzel', serif; }
-        .literary-text { font-family: 'Playfair Display', serif; line-height: 1.8; }
-        @keyframes fade-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-fade-in { animation: fade-in 0.4s ease-out; }
-        @keyframes scale-up { from { opacity: 0; transform: scale(0.9) translateY(30px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-        .animate-scale-up { animation: scale-up 0.3s ease-out; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        h1 { color: #2c3e50; border-bottom: 2px solid #ecf0f1; padding-bottom: 10px; }
+        .story-card {
+            background: white;
+            padding: 15px 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .story-info h3 { margin: 0 0 5px 0; color: #34495e; }
+        .story-info p { margin: 0; color: #7f8c8d; font-size: 0.9em; }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        button:hover { background-color: #2980b9; }
+        #reading-view {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-top: 30px;
+            display: none;
+        }
+        #story-body {
+            white-space: pre-wrap;
+            line-height: 1.6;
+            font-size: 1.1em;
+            margin-top: 20px;
+        }
+        .back-btn { background-color: #95a5a6; margin-bottom: 20px; }
+        .back-btn:hover { background-color: #7f8c8d; }
+        #loading { text-align: center; font-style: italic; color: #7f8c8d; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col max-w-2xl mx-auto px-4 py-6 selection:bg-amber-200 relative pb-24">
+<body>
 
-    <!-- Header Navigation -->
-    <header class="flex flex-col sm:flex-row justify-between items-center border-b border-stone-200 pb-4 mb-6 gap-3">
-        <h1 class="serif-title text-lg font-semibold tracking-wide text-stone-800 text-center sm:text-left">The Scribbler's Almanac</h1>
-        <nav class="flex gap-4 text-xs font-semibold tracking-wide uppercase text-stone-400 items-center">
-            <button onclick="switchTab('dispensary')" id="tab-dispensary" class="text-amber-700 border-b-2 border-amber-700 pb-1 cursor-pointer transition-all">Dispensary</button>
-            <button onclick="switchTab('history')" id="tab-history" class="hover:text-stone-800 pb-1 cursor-pointer transition-all">Retrospective</button>
-            <button onclick="switchTab('anthologia')" id="tab-anthologia" class="hover:text-stone-800 pb-1 cursor-pointer transition-all">Anthologia</button>
-            <button onclick="switchTab('atelier')" id="tab-atelier" class="hover:text-stone-800 pb-1 cursor-pointer transition-all">Atelier</button>
-            
-            <button id="pwa-install-icon" onclick="triggerInstall()" class="hidden hover:text-amber-700 transition-colors cursor-pointer">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-amber-600"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-            </button>
-        </nav>
-    </header>
-
-    <!-- MAIN APP VIEWS -->
-    <main class="flex-grow">
-        
-        <!-- 1. THE DISPENSARY -->
-        <section id="view-dispensary" class="block space-y-6 animate-fade-in">
-            <div class="text-center space-y-2 py-4">
-                <span id="reading-date-label" class="text-xs uppercase tracking-widest text-amber-700 font-semibold">Today's Selection</span>
-                <h2 id="story-title" class="literary-text text-3xl font-semibold text-stone-900">Loading Text...</h2>
-                <p id="story-author" class="text-stone-500 italic text-sm">Please wait while the almanac syncs...</p>
-            </div>
-            
-            <div class="bg-amber-50/60 border border-amber-100 p-3 rounded-lg text-xs text-amber-900 text-center shadow-2xs">
-                ✨ Highlight text inside the work below to automatically capture it for your <strong>Anthologia</strong>.
-            </div>
-
-            <article id="story-body" class="literary-text text-lg text-stone-800 space-y-6 text-justify whitespace-pre-wrap px-1 pb-12">
-                <!-- Content injected dynamically -->
-            </article>
-        </section>
-
-        <!-- [NEW VIEW] 2. THE RETROSPECTIVE (10-DAY HISTORY) -->
-        <section id="view-history" class="hidden space-y-6 animate-fade-in">
-            <div class="border-b border-stone-100 pb-2">
-                <h2 class="serif-title text-base font-semibold text-stone-800 tracking-wide">The Retrospective Ledger</h2>
-                <p class="text-xs text-stone-400 mt-0.5">Missed a entry? Review and read selections from the past 10 days.</p>
-            </div>
-            <div id="history-list" class="grid grid-cols-1 gap-3">
-                <!-- History items populated here -->
-            </div>
-        </section>
-
-        <!-- 3. THE ANTHOLOGIA -->
-        <section id="view-anthologia" class="hidden space-y-6 animate-fade-in">
-            <div class="flex justify-between items-center">
-                <h2 class="serif-title text-base font-semibold text-stone-800 tracking-wide">Anthologia Archives</h2>
-                <button onclick="openQuoteModal()" class="bg-stone-800 hover:bg-stone-700 text-white text-[11px] font-medium px-3 py-1.5 rounded-md cursor-pointer transition-all">Add Fragment</button>
-            </div>
-            <div id="quotes-list" class="space-y-4">
-                <!-- Quotes dynamically populated -->
-            </div>
-        </section>
-
-        <!-- 4. THE ATELIER -->
-        <section id="view-atelier" class="hidden space-y-4 animate-fade-in">
-            <div class="flex justify-between items-center">
-                <h2 class="serif-title text-base font-semibold text-stone-800 tracking-wide">The Atelier Desk</h2>
-                <button onclick="createNewDraft()" class="bg-amber-700 hover:bg-amber-800 text-white text-[11px] font-medium px-3 py-1.5 rounded-md cursor-pointer transition-all">+ New Manuscript</button>
-            </div>
-
-            <!-- Editor Pane -->
-            <div id="editor-pane" class="hidden space-y-4 border border-stone-200 bg-white p-4 rounded-xl shadow-xs">
-                <input type="text" id="editor-title" placeholder="Untitled Document" class="w-full text-lg font-semibold border-b border-stone-100 pb-2 focus:outline-none focus:border-amber-600 font-sans text-stone-800" oninput="saveCurrentPiece()">
-                <textarea id="editor-content" placeholder="Begin translating your mind to prose..." class="w-full h-80 focus:outline-none resize-none literary-text text-base text-stone-800" oninput="saveCurrentPiece()"></textarea>
-                <div class="flex justify-between items-center text-xs text-stone-400">
-                    <span id="save-status">Draft resting locally</span>
-                    <button onclick="closeEditor()" class="text-stone-500 hover:text-stone-800 font-medium cursor-pointer">Minimize Editor</button>
-                </div>
-            </div>
-
-            <!-- Manuscripts Index List -->
-            <div id="drafts-container" class="space-y-2">
-                <h3 class="text-xs font-semibold uppercase tracking-wider text-stone-400 mb-2">Indexed Manuscripts</h3>
-                <div id="drafts-list" class="space-y-2">
-                    <!-- Draft items populated here -->
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <!-- FLOATING SELECTION INTERCEPTOR -->
-    <div id="mobile-clipper" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-stone-900 text-white text-xs font-medium px-4 py-2.5 rounded-full shadow-xl hidden items-center gap-2 z-50 transition-transform active:scale-95 cursor-pointer">
-        <span>Clip Selection to Anthologia</span>
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>
+    <div id="catalog-view">
+        <h1>Classic Library Catalog</h1>
+        <div id="loading">Loading configuration and books...</div>
+        <div id="story-list"></div>
     </div>
 
-    <!-- PWA INSTALLATION DIALOG BAR -->
-    <div id="install-banner" class="fixed bottom-4 left-4 right-4 md:left-1/2 md:right-auto md:-translate-x-1/2 md:w-full md:max-w-md bg-stone-900 border border-stone-800 text-stone-100 p-4 rounded-xl shadow-2xl hidden flex-col sm:flex-row justify-between items-center gap-3 z-50 animate-scale-up">
-        <div class="text-center sm:text-left">
-            <h4 class="text-xs font-bold uppercase tracking-wider text-amber-400">Add to Device</h4>
-            <p class="text-xs text-stone-300 mt-0.5">Install The Scribbler's Almanac for direct access from your apps menu.</p>
-        </div>
-        <div class="flex gap-2 w-full sm:w-auto shrink-0">
-            <button onclick="dismissInstall()" class="flex-1 sm:flex-initial text-[11px] text-stone-400 hover:text-stone-100 font-medium px-3 py-1.5 rounded-md border border-stone-700 cursor-pointer">Skip</button>
-            <button onclick="triggerInstall()" class="flex-1 sm:flex-initial text-[11px] bg-amber-600 hover:bg-amber-700 text-white font-semibold px-3 py-1.5 rounded-md cursor-pointer shadow-xs">Install</button>
-        </div>
+    <div id="reading-view">
+        <button class="back-btn" onclick="showCatalog()">← Back to Catalog</button>
+        <h2 id="story-title"></h2>
+        <h4 id="story-author" style="color: #7f8c8d; margin-top:-10px;"></h4>
+        <hr style="border: 0; border-top: 1px solid #ecf0f1;">
+        <div id="story-body"></div>
     </div>
 
-    <!-- FOOTER -->
-    <footer class="mt-16 pt-4 border-t border-stone-200 flex justify-between text-[11px] text-stone-400">
-        <span>© The Scribbler's Almanac</span>
-        <div class="flex gap-3">
-            <button onclick="exportBackup()" class="hover:text-stone-700 cursor-pointer">Export Ledger JSON</button>
-            <label class="hover:text-stone-700 cursor-pointer">
-                Import Ledger <input type="file" id="import-file" class="hidden" onchange="importBackup(event)">
-            </label>
-        </div>
-    </footer>
-
-    <!-- MANUAL LOG MODAL -->
-    <div id="quote-modal" class="fixed inset-0 bg-stone-950/40 backdrop-blur-xs hidden items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-xl p-5 w-full max-w-md space-y-4 shadow-2xl border border-stone-100 animate-scale-up">
-            <h3 class="serif-title font-semibold text-stone-800">Log Fragment</h3>
-            <textarea id="modal-quote-text" placeholder="&quot;The fields are green, the sky is wide...&quot;" class="w-full h-24 border border-stone-200 p-2.5 rounded-md text-sm focus:outline-none focus:border-amber-600 text-stone-800"></textarea>
-            <div class="grid grid-cols-2 gap-2">
-                <input type="text" id="modal-quote-author" placeholder="Author" class="border border-stone-200 p-2 rounded-md text-sm focus:outline-none focus:border-amber-600 text-stone-800">
-                <input type="text" id="modal-quote-source" placeholder="Source Book / Event" class="border border-stone-200 p-2 rounded-md text-sm focus:outline-none focus:border-amber-600 text-stone-800">
-            </div>
-            <div class="flex justify-end gap-2 text-xs font-medium pt-2">
-                <button onclick="closeQuoteModal()" class="px-3 py-2 bg-stone-100 rounded-md text-stone-600 hover:bg-stone-200 cursor-pointer">Cancel</button>
-                <button onclick="saveManualQuote()" class="px-3 py-2 bg-amber-700 text-white rounded-md hover:bg-amber-800 cursor-pointer">Save Entry</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ENGINE CONTROLLERS LOGIC -->
     <script>
-        let globalLibrary = [];
-        let currentPieceId = null;
-        let activeSelectedText = "";
-        let deferredPrompt = null;
-
-        window.addEventListener('DOMContentLoaded', () => {
-            loadLibraryData();
-            renderCommonplace();
-            renderDrafts();
-            setupCrossPlatformSelection();
-            setupPWAInstallTracking();
-        });
-
-        // 1. DYNAMIC COMPONENT TAB MANAGER
-        function switchTab(tabId) {
-            ['dispensary', 'history', 'anthologia', 'atelier'].forEach(id => {
-                document.getElementById(`view-${id}`).classList.add('hidden');
-                document.getElementById(`tab-${id}`).className = "hover:text-stone-800 pb-1 cursor-pointer transition-all";
-            });
-            document.getElementById(`view-${tabId}`).classList.remove('hidden');
-            document.getElementById(`tab-${tabId}`).className = "text-amber-700 border-b-2 border-amber-700 pb-1 cursor-pointer transition-all";
+        // Clean Gutenberg text directly in the browser using JavaScript regex
+        function cleanGutenbergText(rawText) {
+            const startPatterns = [
+                /\*\*\* START OF TH(E|IS) PROJECT GUTENBERG EBOOK .* \*\*\*/i,
+                /\*\*\*START OF TH(E|IS) PROJECT GUTENBERG EBOOK .* \*\*\*/i,
+                /START OF THE PROJECT GUTENBERG EBOOK/i,
+                /\*\*\* START OF USER COMMENTS \*\*\*/i
+            ];
+            const endPatterns = [
+                /\*\*\* END OF TH(E|IS) PROJECT GUTENBERG EBOOK .* \*\*\*/i,
+                /\*\*\*END OF TH(E|IS) PROJECT GUTENBERG EBOOK .* \*\*\*/i,
+                /END OF THE PROJECT GUTENBERG EBOOK/i,
+                /\*\*\* END OF USER COMMENTS \*\*\*/i
+            ];
             
-            if(tabId === 'history') { renderRetrospectiveList(); }
-        }
-
-        // 2. EXTERNAL MANIFEST LOADER & SERIALIZER LOGIC
-        function loadLibraryData() {
-            fetch('library.json')
-                .then(response => {
-                    if (!response.ok) throw new Error("JSON Fetch missing");
-                    return response.json();
-                })
-                .then(data => {
-                    globalLibrary = data;
-                    buildDailyAlmanacDisplay();
-                })
-                .catch(err => {
-                    console.error("Local library payload fell back to fallback core state:", err);
-                    document.getElementById('story-title').innerText = "Database File Missing";
-                    document.getElementById('story-author').innerText = "Configuration Needed";
-                    document.getElementById('story-body').innerText = "Please ensure your library.json file is added directly to your main repository level on GitHub.";
-                });
-        }
-
-        // Calculates day index sequence for absolute tracking 
-        function getAbsoluteDayIndex(dateObj) {
-            return Math.floor(dateObj.getTime() / (1000 * 60 * 60 * 24));
-        }
-
-        function buildDailyAlmanacDisplay(targetDate = new Date(), isReviewingHistory = false) {
-            if (globalLibrary.length === 0) return;
+            let startIndex = 0;
+            let endIndex = rawText.length;
             
-            const targetDayIndex = getAbsoluteDayIndex(targetDate);
-            // Maps the day cleanly across array lengths automatically 
-            const selectedStory = globalLibrary[targetDayIndex % globalLibrary.length];
-
-            // Injects text cleanly into screen interfaces
-            document.getElementById('story-title').innerText = selectedStory.title;
-            document.getElementById('story-author').innerText = `by ${selectedStory.author}`;
-            document.getElementById('story-body').innerText = selectedStory.content;
-            
-            document.getElementById('story-body').dataset.storyTitle = selectedStory.title;
-            document.getElementById('story-body').dataset.storyAuthor = selectedStory.author;
-
-            const labelNode = document.getElementById('reading-date-label');
-            if(isReviewingHistory) {
-                labelNode.innerText = `Retrospective View: ${targetDate.toLocaleDateString(undefined, {month: 'short', day: 'numeric'})}`;
-                labelNode.classList.replace('text-amber-700', 'text-stone-500');
-            } else {
-                labelNode.innerText = "Today's Selection";
-                labelNode.classList.replace('text-stone-500', 'text-amber-700');
+            for (let pattern of startPatterns) {
+                const match = rawText.match(pattern);
+                if (match) {
+                    startIndex = match.index + match[0].length;
+                    break;
+                }
             }
+            for (let pattern of endPatterns) {
+                const match = rawText.match(pattern);
+                if (match) {
+                    endIndex = match.index;
+                    break;
+                }
+            }
+            return rawText.substring(startIndex, endIndex).trim();
         }
 
-        // 3. RETROSPECTIVE RETRIEVAL ENGINE (SLIDING 10 DAYS LOOKBACK)
-        function renderRetrospectiveList() {
-            const container = document.getElementById('history-list');
-            let htmlBuffer = "";
-            const today = new Date();
-
-            // Iterate backward matching exactly 10 historical days
-            for(let i = 0; i < 10; i++) {
-                const targetPastDate = new Date();
-                targetPastDate.setDate(today.getDate() - i);
-
-                const pastDayIndex = getAbsoluteDayIndex(targetPastDate);
-                const historicStory = globalLibrary[pastDayIndex % globalLibrary.length];
-
-                if(!historicStory) continue;
-
-                const dateLabelString = i === 0 ? "Today" : targetPastDate.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+        window.onload = async function() {
+            try {
+                // 1. Load library.json relative to the website's location
+                const configResponse = await fetch('./library.json');
+                const config = await configResponse.json();
                 
-                // Excerpt slice formatting
-                const excerptText = historicStory.content.substring(0, 110) + "...";
-
-                htmlBuffer += `
-                    <div onclick="viewHistoricalDay(${targetPastDate.getTime()})" class="bg-white border border-stone-200/70 p-4 rounded-xl flex justify-between items-center hover:border-amber-300 transition-all cursor-pointer shadow-2xs group">
-                        <div class="space-y-1 pr-2">
-                            <span class="text-[10px] font-bold uppercase tracking-wider text-amber-800 bg-amber-50 px-2 py-0.5 rounded">${dateLabelString}</span>
-                            <h3 class="font-medium text-stone-800 text-sm group-hover:text-amber-900 transition-colors mt-1">${historicStory.title}</h3>
-                            <p class="text-xs text-stone-400 italic">${excerptText}</p>
+                const ids = config.featured_story_ids || [];
+                const baseUrl = config.api_configuration.base_url || 'https://gutendex.com/books/';
+                
+                // 2. Fetch book data directly from the public catalog API
+                const catalogResponse = await fetch(`${baseUrl}?ids=${ids.join(',')}`);
+                const data = await catalogResponse.json();
+                const stories = data.results || [];
+                
+                document.getElementById('loading').style.display = 'none';
+                const listContainer = document.getElementById('story-list');
+                
+                stories.forEach(story => {
+                    const formats = story.formats || {};
+                    const textLink = formats['text/plain; charset=utf-8'] || formats['text/plain'];
+                    const author = story.authors.length > 0 ? story.authors[0].name : 'Unknown Author';
+                    
+                    const card = document.createElement('div');
+                    card.className = 'story-card';
+                    card.innerHTML = `
+                        <div class="story-info">
+                            <h3>${story.title}</h3>
+                            <p>By ${author}</p>
                         </div>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-stone-300 group-hover:text-amber-700 w-4 h-4 shrink-0 transition-colors"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                    </div>
-                `;
+                        <button onclick="readBook('${story.title.replace(/'/g, "\\'")}', '${author.replace(/'/g, "\\'")}', '${textLink}')">Read</button>
+                    `;
+                    listContainer.appendChild(card);
+                });
+            } catch (error) {
+                document.getElementById('loading').innerText = "Error loading library configuration or book data.";
+                console.error(error);
             }
-            container.innerHTML = htmlBuffer;
-        }
+        };
 
-        function viewHistoricalDay(timestamp) {
-            const targetDate = new Date(timestamp);
-            buildDailyAlmanacDisplay(targetDate, true);
-            switchTab('dispensary');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+        async function readBook(title, author, url) {
+            document.getElementById('catalog-view').style.display = 'none';
+            document.getElementById('reading-view').style.display = 'block';
+            document.getElementById('story-title').innerText = title;
+            document.getElementById('story-author').innerText = `By ${author}`;
+            document.getElementById('story-body').innerText = "Downloading and scrubbing text file from Project Gutenberg...";
 
-        // 4. ANDROID AND DESKTOP COMPATIBLE CAPTURE INTERCEPTOR 
-        function setupCrossPlatformSelection() {
-            const clipperButton = document.getElementById('mobile-clipper');
-
-            document.addEventListener('selectionchange', () => {
-                const selection = window.getSelection();
-                const selectedText = selection.toString().trim();
-                const container = document.getElementById('story-body');
-
-                if (selectedText.length > 4 && container.contains(selection.anchorNode)) {
-                    activeSelectedText = selectedText;
-                    clipperButton.classList.replace('hidden', 'flex');
-                } else {
-                    setTimeout(() => {
-                        if (window.getSelection().toString().trim().length === 0) {
-                            clipperButton.classList.replace('flex', 'hidden');
-                        }
-                    }, 2000);
-                }
-            });
-
-            clipperButton.addEventListener('click', (e) => {
-                e.preventDefault(); e.stopPropagation();
-                if (activeSelectedText) {
-                    const author = document.getElementById('story-body').dataset.storyAuthor;
-                    const source = document.getElementById('story-body').dataset.storyTitle;
-                    saveQuote(activeSelectedText, author, source);
-                    
-                    clipperButton.innerHTML = `Fragment Clipped! ✓`;
-                    setTimeout(() => {
-                        clipperButton.innerHTML = `<span>Clip Selection to Anthologia</span><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>`;
-                        clipperButton.classList.replace('flex', 'hidden');
-                    }, 1200);
-                    
-                    window.getSelection().removeAllRanges();
-                    activeSelectedText = "";
-                }
-            });
-        }
-
-        // 5. ANTHOLOGIA DATABASE SYSTEM
-        function saveQuote(text, author, source) {
-            let quotes = JSON.parse(localStorage.getItem('almanac_quotes') || '[]');
-            quotes.unshift({ id: Date.now(), text, author: author || 'Unknown', source: source || 'Handcrafted Entry' });
-            localStorage.setItem('almanac_quotes', JSON.stringify(quotes));
-            renderCommonplace();
-        }
-
-        function renderCommonplace() {
-            const container = document.getElementById('quotes-list');
-            const quotes = JSON.parse(localStorage.getItem('almanac_quotes') || '[]');
-            
-            if (quotes.length === 0) {
-                container.innerHTML = `<div class="text-center py-12 text-sm text-stone-400 italic">Your Anthologia database layer is empty. Highlight text slices or append manual modules.</div>`;
-                return;
-            }
-
-            container.innerHTML = quotes.map(q => `
-                <div class="bg-white border border-stone-200/80 p-4 rounded-xl space-y-2 relative shadow-2xs">
-                    <p class="literary-text text-stone-800 text-base italic">"${q.text}"</p>
-                    <div class="text-xs text-stone-400 flex justify-between items-center">
-                        <span>— ${q.author}, <span class="underline decoration-stone-200">${q.source}</span></span>
-                        <button onclick="deleteQuote(${q.id})" class="text-stone-300 hover:text-rose-600 font-medium transition-colors cursor-pointer p-1">Delete</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function deleteQuote(id) {
-            let quotes = JSON.parse(localStorage.getItem('almanac_quotes') || '[]');
-            quotes = quotes.filter(q => q.id !== id);
-            localStorage.setItem('almanac_quotes', JSON.stringify(quotes));
-            renderCommonplace();
-        }
-
-        function openQuoteModal() { document.getElementById('quote-modal').classList.replace('hidden', 'flex'); }
-        function closeQuoteModal() {
-            document.getElementById('quote-modal').classList.replace('flex', 'hidden');
-            document.getElementById('modal-quote-text').value = '';
-            document.getElementById('modal-quote-author').value = '';
-            document.getElementById('modal-quote-source').value = '';
-        }
-        function saveManualQuote() {
-            const txt = document.getElementById('modal-quote-text').value.trim();
-            const aut = document.getElementById('modal-quote-author').value.trim();
-            const src = document.getElementById('modal-quote-source').value.trim();
-            if(!txt) return alert("Content frame cannot be blank.");
-            saveQuote(txt, aut, src);
-            closeQuoteModal();
-        }
-
-        // 6. ATELIER DRAFT WRITING MACHINE
-        function createNewDraft() {
-            let drafts = JSON.parse(localStorage.getItem('almanac_drafts') || '[]');
-            const newPiece = { id: Date.now(), title: '', content: '', updated: Date.now() };
-            drafts.unshift(newPiece);
-            localStorage.setItem('almanac_drafts', JSON.stringify(drafts));
-            openEditor(newPiece.id);
-        }
-
-        function openEditor(id) {
-            currentPieceId = id;
-            let drafts = JSON.parse(localStorage.getItem('almanac_drafts') || '[]');
-            const piece = drafts.find(d => d.id === id);
-            
-            if (piece) {
-                document.getElementById('editor-title').value = piece.title;
-                document.getElementById('editor-content').value = piece.content;
-                document.getElementById('editor-pane').classList.remove('hidden');
-                document.getElementById('drafts-container').classList.add('hidden');
+            try {
+                // Fetch text directly (handles CORS automatically via standard proxying if needed, but Gutendex text links allow direct web access)
+                const response = await fetch(url);
+                const rawText = await response.text();
+                document.getElementById('story-body').innerText = cleanGutenbergText(rawText);
+                window.scrollTo(0, 0);
+            } catch (error) {
+                document.getElementById('story-body').innerText = "Failed to load story text. This book link might be blocked by browser security restrictions (CORS).";
             }
         }
 
-        function saveCurrentPiece() {
-            if (!currentPieceId) return;
-            const statusNode = document.getElementById('save-status');
-            statusNode.innerText = "Syncing desk changes...";
-            
-            let drafts = JSON.parse(localStorage.getItem('almanac_drafts') || '[]');
-            const idx = drafts.findIndex(d => d.id === currentPieceId);
-            
-            if (idx !== -1) {
-                drafts[idx].title = document.getElementById('editor-title').value;
-                drafts[idx].content = document.getElementById('editor-content').value;
-                drafts[idx].updated = Date.now();
-                localStorage.setItem('almanac_drafts', JSON.stringify(drafts));
-                setTimeout(() => { statusNode.innerText = "Saved locally ✓"; }, 300);
-            }
-        }
-
-        function closeEditor() {
-            currentPieceId = null;
-            document.getElementById('editor-pane').classList.add('hidden');
-            document.getElementById('drafts-container').classList.remove('hidden');
-            renderDrafts();
-        }
-
-        function renderDrafts() {
-            const container = document.getElementById('drafts-list');
-            const drafts = JSON.parse(localStorage.getItem('almanac_drafts') || '[]');
-            
-            if (drafts.length === 0) {
-                container.innerHTML = `<div class="text-center py-8 text-xs text-stone-400 italic">Atelier script roster is empty. Tap '+ New Manuscript' to instantiate.</div>`;
-                return;
-            }
-
-            container.innerHTML = drafts.map(d => `
-                <div class="bg-white border border-stone-200 rounded-lg p-3 flex justify-between items-center shadow-2xs">
-                    <div onclick="openEditor(${d.id})" class="flex-grow cursor-pointer pr-4">
-                        <h4 class="font-medium text-stone-800 text-sm">${d.title.trim() || '&lt;Untitled Manuscript&gt;'}</h4>
-                        <p class="text-[11px] text-stone-400">Restructured: ${new Date(d.updated).toLocaleDateString()}</p>
-                    </div>
-                    <button onclick="deleteDraft(${d.id})" class="text-stone-300 hover:text-rose-600 text-xs px-2 py-1 transition-colors cursor-pointer">Discard</button>
-                </div>
-            `).join('');
-        }
-
-        function deleteDraft(id) {
-            if(confirm("Confirm deletion of file tracking index? Data recovery cannot be invoked.")) {
-                let drafts = JSON.parse(localStorage.getItem('almanac_drafts') || '[]');
-                drafts = drafts.filter(d => d.id !== id);
-                localStorage.setItem('almanac_drafts', JSON.stringify(drafts));
-                renderDrafts();
-            }
-        }
-
-        // 7. BACKUP FILE MANAGEMENT
-        function exportBackup() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({
-                quotes: JSON.parse(localStorage.getItem('almanac_quotes') || '[]'),
-                drafts: JSON.parse(localStorage.getItem('almanac_drafts') || '[]')
-            }));
-            const downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", `almanac_ledger_${new Date().toISOString().slice(0,10)}.json`);
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click(); downloadAnchor.remove();
-        }
-
-        // 8. PWA SERVICE DESIGN LOGIC 
-        function setupPWAInstallTracking() {
-            const installBanner = document.getElementById('install-banner');
-            const installIcon = document.getElementById('pwa-install-icon');
-            const hasInstalled = localStorage.getItem('almanac_app_installed') === 'true';
-            
-            window.addEventListener('beforeinstallprompt', (e) => {
-                e.preventDefault(); deferredPrompt = e;
-                if (!hasInstalled) {
-                    installBanner.classList.replace('hidden', 'flex');
-                    installIcon.classList.remove('hidden');
-                }
-            });
-
-            window.addEventListener('appinstalled', () => {
-                hideInstallationUI();
-                localStorage.setItem('almanac_app_installed', 'true');
-                deferredPrompt = null;
-            });
-        }
-
-        function hideInstallationUI() {
-            document.getElementById('install-banner').classList.replace('flex', 'hidden');
-            document.getElementById('pwa-install-icon').classList.add('hidden');
-        }
-
-        function triggerInstall() {
-            if (!deferredPrompt) { hideInstallationUI(); return; }
-            hideInstallationUI();
-            deferredPrompt.prompt();
-            deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
-        }
-
-        function dismissInstall() { hideInstallationUI(); }
-    </script>
-
-    <!-- SERVICE WORKER INTERFACES -->
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                const repositoryPath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
-                navigator.serviceWorker.register(repositoryPath + 'sw.js')
-                    .catch(err => console.error('Registration failed:', err));
-            });
+        function showCatalog() {
+            document.getElementById('catalog-view').style.display = 'block';
+            document.getElementById('reading-view').style.display = 'none';
         }
     </script>
 </body>

@@ -155,13 +155,41 @@
             document.getElementById('story-body').innerText = "Downloading and scrubbing text file from Project Gutenberg...";
 
             try {
-                // Fetch text directly (handles CORS automatically via standard proxying if needed, but Gutendex text links allow direct web access)
-                const response = await fetch(url);
+                // Use a public CORS proxy to safely fetch the Gutenberg text file
+                const corsProxy = 'https://cors-anywhere.herokuapp.com/';
+                
+                // Route your target book URL right through the proxy server
+                const response = await fetch(`${corsProxy}${url}`, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+
+                if (!response.ok) {
+                    // If the proxy requires temporary activation, guide the user
+                    if (response.status === 403) {
+                        throw new Error("Proxy Activation Required");
+                    }
+                    throw new Error("Network response was not ok");
+                }
+
                 const rawText = await response.text();
                 document.getElementById('story-body').innerText = cleanGutenbergText(rawText);
                 window.scrollTo(0, 0);
             } catch (error) {
-                document.getElementById('story-body').innerText = "Failed to load story text. This book link might be blocked by browser security restrictions (CORS).";
+                if (error.message === "Proxy Activation Required") {
+                    document.getElementById('story-body').innerHTML = `
+                        <div style="background-color: #fff3cd; color: #856404; padding: 15px; border-radius: 5px; border: 1px solid #ffeeba;">
+                            <strong>Temporary Proxy Activation Needed:</strong><br>
+                            To protect against abuse, the free CORS proxy requires a quick one-click unlock.<br><br>
+                            1. Click this link: <a href="https://cors-anywhere.herokuapp.com/corsdemo" target="_blank" style="color: #533f03; font-weight: bold; text-decoration: underline;">Unlock CORS Anywhere Proxy</a><br>
+                            2. Click the big button that says <strong>"Request temporary access to the demo server"</strong>.<br>
+                            3. Come back to this page and click "Read" again!
+                        </div>`;
+                } else {
+                    document.getElementById('story-body').innerText = "Failed to load story text. The public text servers might be temporarily busy or down.";
+                    console.error("Fetch error:", error);
+                }
             }
         }
 

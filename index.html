@@ -11,76 +11,76 @@
     <!-- Google Fonts for premium literary typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Plus+Jakarta+Sans:wght@400;500;600&workspace=copy" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #fbfbfa; color: #2d2d2a; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #fbfbfa; color: #2d2d2a; -webkit-tap-highlight-color: transparent; }
         .serif-title { font-family: 'Cinzel', serif; }
         .literary-text { font-family: 'Playfair Display', serif; line-height: 1.8; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col max-w-2xl mx-auto px-4 py-6 selection:bg-amber-200">
+<body class="min-h-screen flex flex-col max-w-2xl mx-auto px-4 py-6 selection:bg-amber-200 relative pb-24">
 
     <!-- Header Navigation -->
-    <header class="flex justify-between items-center border-b border-stone-200 pb-4 mb-6">
-        <h1 class="serif-title text-xl font-semibold tracking-wide text-stone-800">The Almanac</h1>
-        <nav class="flex gap-4 text-sm font-medium text-stone-500">
-            <button onclick="switchTab('dispensary')" id="tab-dispensary" class="text-amber-700 font-semibold border-b-2 border-amber-700 pb-1 cursor-pointer">Read</button>
-            <button onclick="switchTab('anthologia')" id="tab-anthologia" class="hover:text-stone-800 pb-1 cursor-pointer">Commonplace</button>
-            <button onclick="switchTab('atelier')" id="tab-atelier" class="hover:text-stone-800 pb-1 cursor-pointer">Write</button>
+    <header class="flex flex-col sm:flex-row justify-between items-center border-b border-stone-200 pb-4 mb-6 gap-3">
+        <h1 class="serif-title text-lg font-semibold tracking-wide text-stone-800 text-center sm:text-left">The Scribbler's Almanac</h1>
+        <nav class="flex gap-4 text-xs font-semibold tracking-wide uppercase text-stone-400">
+            <button onclick="switchTab('dispensary')" id="tab-dispensary" class="text-amber-700 border-b-2 border-amber-700 pb-1 cursor-pointer transition-all">Dispensary</button>
+            <button onclick="switchTab('anthologia')" id="tab-anthologia" class="hover:text-stone-800 pb-1 cursor-pointer transition-all">Anthologia</button>
+            <button onclick="switchTab('atelier')" id="tab-atelier" class="hover:text-stone-800 pb-1 cursor-pointer transition-all">Atelier</button>
         </nav>
     </header>
 
     <!-- MAIN APP VIEWS -->
     <main class="flex-grow">
         
-        <!-- 1. THE DISPENSARY (DAILY READING) -->
-        <section id="view-dispensary" class="block space-y-6 animate-fade-in">
+        <!-- 1. THE DISPENSARY -->
+        <section id="view-dispensary" class="block space-y-6">
             <div class="text-center space-y-2 py-4">
                 <span class="text-xs uppercase tracking-widest text-stone-400 font-semibold">Today's Selection</span>
                 <h2 id="story-title" class="literary-text text-3xl font-semibold text-stone-900">...</h2>
                 <p id="story-author" class="text-stone-500 italic text-sm">...</p>
             </div>
             
-            <div class="bg-amber-50/50 border border-amber-100 p-3 rounded-lg text-xs text-amber-800 text-center">
-                💡 <strong>Tip:</strong> Highlight any text inside the story below to clip it directly to your Commonplace book!
+            <div class="bg-amber-50/60 border border-amber-100 p-3 rounded-lg text-xs text-amber-900 text-center shadow-2xs">
+                ✨ Highlight text inside the work below to automatically capture it for your <strong>Anthologia</strong>.
             </div>
 
-            <article id="story-body" class="literary-text text-lg text-stone-800 space-y-6 text-justify whitespace-pre-wrap px-2 pb-12">
+            <article id="story-body" class="literary-text text-lg text-stone-800 space-y-6 text-justify whitespace-pre-wrap px-1 pb-12">
                 <!-- Content injected dynamically -->
             </article>
         </section>
 
-        <!-- 2. THE ANTHOLOGIA (COMMONPLACE BOOK) -->
+        <!-- 2. THE ANTHOLOGIA -->
         <section id="view-anthologia" class="hidden space-y-6">
             <div class="flex justify-between items-center">
-                <h2 class="serif-title text-lg font-semibold text-stone-800">Your Commonplace Book</h2>
-                <button onclick="openQuoteModal()" class="bg-stone-800 hover:bg-stone-700 text-white text-xs px-3 py-1.5 rounded-md cursor-pointer transition">Add Custom Fragment</button>
+                <h2 class="serif-title text-base font-semibold text-stone-800 tracking-wide">Anthologia Archives</h2>
+                <button onclick="openQuoteModal()" class="bg-stone-800 hover:bg-stone-700 text-white text-[11px] font-medium px-3 py-1.5 rounded-md cursor-pointer transition-all">Add Fragment</button>
             </div>
             <div id="quotes-list" class="space-y-4">
                 <!-- Quotes dynamically populated -->
             </div>
         </section>
 
-        <!-- 3. THE ATELIER (CREATIVE WRITING EDITOR) -->
+        <!-- 3. THE ATELIER -->
         <section id="view-atelier" class="hidden space-y-4">
             <div class="flex justify-between items-center">
-                <h2 class="serif-title text-lg font-semibold text-stone-800">The Atelier</h2>
-                <button onclick="createNewDraft()" class="bg-amber-700 hover:bg-amber-800 text-white text-xs px-3 py-1.5 rounded-md cursor-pointer transition">+ New Piece</button>
+                <h2 class="serif-title text-base font-semibold text-stone-800 tracking-wide">The Atelier Desk</h2>
+                <button onclick="createNewDraft()" class="bg-amber-700 hover:bg-amber-800 text-white text-[11px] font-medium px-3 py-1.5 rounded-md cursor-pointer transition-all">+ New Manuscript</button>
             </div>
 
-            <!-- Editor Pane (Hidden until a piece is selected or created) -->
+            <!-- Editor Pane -->
             <div id="editor-pane" class="hidden space-y-4 border border-stone-200 bg-white p-4 rounded-xl shadow-xs">
-                <input type="text" id="editor-title" placeholder="Untitled Piece" class="w-full text-xl font-semibold border-b border-stone-100 pb-2 focus:outline-none focus:border-amber-600 font-sans" oninput="saveCurrentPiece()">
-                <textarea id="editor-content" placeholder="Begin writing your story or poem here..." class="w-full h-80 focus:outline-none resize-none field-sizing-content literary-text text-base" oninput="saveCurrentPiece()"></textarea>
+                <input type="text" id="editor-title" placeholder="Untitled Document" class="w-full text-lg font-semibold border-b border-stone-100 pb-2 focus:outline-none focus:border-amber-600 font-sans text-stone-800" oninput="saveCurrentPiece()">
+                <textarea id="editor-content" placeholder="Begin translating your mind to prose..." class="w-full h-80 focus:outline-none resize-none literary-text text-base text-stone-800" oninput="saveCurrentPiece()"></textarea>
                 <div class="flex justify-between items-center text-xs text-stone-400">
-                    <span id="save-status">All changes saved locally</span>
-                    <button onclick="closeEditor()" class="text-stone-500 hover:text-stone-800 font-medium">Close Editor</button>
+                    <span id="save-status">Draft resting locally</span>
+                    <button onclick="closeEditor()" class="text-stone-500 hover:text-stone-800 font-medium cursor-pointer">Minimize Editor</button>
                 </div>
             </div>
 
-            <!-- Documents List -->
+            <!-- Manuscripts Index List -->
             <div id="drafts-container" class="space-y-2">
-                <h3 class="text-xs font-semibold uppercase tracking-wider text-stone-400 mb-2">Your Manuscripts</h3>
+                <h3 class="text-xs font-semibold uppercase tracking-wider text-stone-400 mb-2">Indexed Manuscripts</h3>
                 <div id="drafts-list" class="space-y-2">
                     <!-- Draft items populated here -->
                 </div>
@@ -88,8 +88,26 @@
         </section>
     </main>
 
-    <!-- FOOTER MANAGEMENT (BACKUPS) -->
-    <footer class="mt-12 pt-4 border-t border-stone-200 flex justify-between text-[11px] text-stone-400">
+    <!-- MOBILE-FRIENDLY POPUP BUTTON FOR EXTRACTED TEXT -->
+    <div id="mobile-clipper" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-stone-900 text-white text-xs font-medium px-4 py-2.5 rounded-full shadow-xl hidden items-center gap-2 z-50 transition-transform active:scale-95 cursor-pointer">
+        <span>Clip Selection to Anthologia</span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>
+    </div>
+
+    <!-- PWA MOBILE & DESKTOP INSTALLATION DIALOG BAR -->
+    <div id="install-banner" class="fixed bottom-4 left-4 right-4 md:left-1/2 md:right-auto md:-translate-x-1/2 md:w-full md:max-w-md bg-stone-900 border border-stone-800 text-stone-100 p-4 rounded-xl shadow-2xl hidden flex-col sm:flex-row justify-between items-center gap-3 z-50">
+        <div class="text-center sm:text-left">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-amber-400">App Installation Available</h4>
+            <p class="text-xs text-stone-300 mt-0.5">Add The Scribbler's Almanac directly to your home screen or desktop apps menu.</p>
+        </div>
+        <div class="flex gap-2 w-full sm:w-auto shrink-0">
+            <button onclick="dismissInstall()" class="flex-1 sm:flex-initial text-[11px] text-stone-400 hover:text-stone-100 font-medium px-3 py-1.5 rounded-md border border-stone-700 cursor-pointer">Ignore</button>
+            <button onclick="triggerInstall()" class="flex-1 sm:flex-initial text-[11px] bg-amber-600 hover:bg-amber-700 text-white font-semibold px-3 py-1.5 rounded-md cursor-pointer shadow-xs">Install App</button>
+        </div>
+    </div>
+
+    <!-- UTILITIES FOOTER -->
+    <footer class="mt-16 pt-4 border-t border-stone-200 flex justify-between text-[11px] text-stone-400">
         <span>© The Scribbler's Almanac</span>
         <div class="flex gap-3">
             <button onclick="exportBackup()" class="hover:text-stone-700 cursor-pointer">Export Ledger JSON</button>
@@ -99,14 +117,14 @@
         </div>
     </footer>
 
-    <!-- ADD MANUALLY OVERLAY MODAL -->
-    <div id="quote-modal" class="fixed inset-0 bg-stone-900/40 backdrop-blur-xs hidden items-center justify-center p-4">
-        <div class="bg-white rounded-xl p-5 w-full max-w-md space-y-4 shadow-xl">
+    <!-- LOG DIALOG OVERLAY FRAME -->
+    <div id="quote-modal" class="fixed inset-0 bg-stone-950/40 backdrop-blur-xs hidden items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl p-5 w-full max-w-md space-y-4 shadow-2xl border border-stone-100 animate-scale-up">
             <h3 class="serif-title font-semibold text-stone-800">Log Fragment</h3>
-            <textarea id="modal-quote-text" placeholder="\"The fields are green, the sky is wide...\"" class="w-full h-24 border border-stone-200 p-2 rounded-md text-sm focus:outline-none focus:border-amber-600"></textarea>
+            <textarea id="modal-quote-text" placeholder="&quot;The fields are green, the sky is wide...&quot;" class="w-full h-24 border border-stone-200 p-2.5 rounded-md text-sm focus:outline-none focus:border-amber-600 text-stone-800"></textarea>
             <div class="grid grid-cols-2 gap-2">
-                <input type="text" id="modal-quote-author" placeholder="Author" class="border border-stone-200 p-2 rounded-md text-sm focus:outline-none focus:border-amber-600">
-                <input type="text" id="modal-quote-source" placeholder="Source / Book Title" class="border border-stone-200 p-2 rounded-md text-sm focus:outline-none focus:border-amber-600">
+                <input type="text" id="modal-quote-author" placeholder="Author" class="border border-stone-200 p-2 rounded-md text-sm focus:outline-none focus:border-amber-600 text-stone-800">
+                <input type="text" id="modal-quote-source" placeholder="Source Book / Event" class="border border-stone-200 p-2 rounded-md text-sm focus:outline-none focus:border-amber-600 text-stone-800">
             </div>
             <div class="flex justify-end gap-2 text-xs font-medium pt-2">
                 <button onclick="closeQuoteModal()" class="px-3 py-2 bg-stone-100 rounded-md text-stone-600 hover:bg-stone-200 cursor-pointer">Cancel</button>
@@ -115,9 +133,9 @@
         </div>
     </div>
 
-    <!-- APPLICATION SCRIPTS & APPLICATION DATA -->
+    <!-- LOGIC APPLICATION CORE CONTROLLERS -->
     <script>
-        // 1. PUBLIC DOMAIN CURATED STORIES LIBRARIES
+        // PUBLIC DOMAIN CURATED STORIES CONTAINER
         const ALMANAC_LIBRARY = [
             {
                 id: 1,
@@ -139,27 +157,29 @@
             }
         ];
 
-        // 2. STATE ENGINE & INTIALIZATION
         let currentPieceId = null;
+        let activeSelectedText = "";
+        let deferredPrompt = null;
 
         window.addEventListener('DOMContentLoaded', () => {
             initDailyReading();
             renderCommonplace();
             renderDrafts();
-            setupHighlightListener();
+            setupCrossPlatformSelection();
+            setupPWAInstallTracking();
         });
 
-        // 3. TAB NAVIGATION CONTROLLER
+        // 1. DYNAMIC COMPONENT TAB MANAGER
         function switchTab(tabId) {
             ['dispensary', 'anthologia', 'atelier'].forEach(id => {
                 document.getElementById(`view-${id}`).classList.add('hidden');
-                document.getElementById(`tab-${id}`).className = "hover:text-stone-800 pb-1 cursor-pointer";
+                document.getElementById(`tab-${id}`).className = "hover:text-stone-800 pb-1 cursor-pointer transition-all";
             });
             document.getElementById(`view-${tabId}`).classList.remove('hidden');
-            document.getElementById(`tab-${tabId}`).className = "text-amber-700 font-semibold border-b-2 border-amber-700 pb-1 cursor-pointer";
+            document.getElementById(`tab-${tabId}`).className = "text-amber-700 border-b-2 border-amber-700 pb-1 cursor-pointer transition-all";
         }
 
-        // 4. LITERARY PIECE RELEASER (ROTATING DAILY)
+        // 2. TIMELOCK CONTENT RETRIEVAL 
         function initDailyReading() {
             const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 1)) / 86400000);
             const selectedStory = ALMANAC_LIBRARY[dayOfYear % ALMANAC_LIBRARY.length];
@@ -171,23 +191,53 @@
             document.getElementById('story-body').dataset.storyAuthor = selectedStory.author;
         }
 
-        // 5. HIGHLIGHT SELECTION INTERCEPTOR (COMMONPLACE MAKER)
-        function setupHighlightListener() {
-            document.getElementById('story-body').addEventListener('mouseup', () => {
-                const selectedText = window.getSelection().toString().trim();
-                if (selectedText.length > 5) {
+        // 3. ANDROID AND DESKTOP COMPATIBLE CAPTURE INTERCEPTOR 
+        function setupCrossPlatformSelection() {
+            const clipperButton = document.getElementById('mobile-clipper');
+
+            // Listen directly to global document selections to seamlessly hook on Android system text engines
+            document.addEventListener('selectionchange', () => {
+                const selection = window.getSelection();
+                const selectedText = selection.toString().trim();
+                const container = document.getElementById('story-body');
+
+                if (selectedText.length > 4 && container.contains(selection.anchorNode)) {
+                    activeSelectedText = selectedText;
+                    // Position and surface floating anchor button interface
+                    clipperButton.classList.replace('hidden', 'flex');
+                } else {
+                    // Delay dropping selection cleanly to prevent collision with tap dynamics
+                    setTimeout(() => {
+                        if (window.getSelection().toString().trim().length === 0) {
+                            clipperButton.classList.replace('flex', 'hidden');
+                        }
+                    }, 2000);
+                }
+            });
+
+            // Action call when clicking execution button
+            clipperButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (activeSelectedText) {
                     const author = document.getElementById('story-body').dataset.storyAuthor;
                     const source = document.getElementById('story-body').dataset.storyTitle;
+                    saveQuote(activeSelectedText, author, source);
                     
-                    if (confirm(`Add this fragment to your Commonplace book?\n\n"${selectedText.substring(0, 40)}..."`)) {
-                        saveQuote(selectedText, author, source);
-                        window.getSelection().removeAllRanges();
-                    }
+                    // Visual validation toast feedback loop
+                    clipperButton.innerText = "Fragment Clipped ✓";
+                    setTimeout(() => {
+                        clipperButton.innerHTML = `<span>Clip Selection to Anthologia</span><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>`;
+                        clipperButton.classList.replace('flex', 'hidden');
+                    }, 1200);
+                    
+                    window.getSelection().removeAllRanges();
+                    activeSelectedText = "";
                 }
             });
         }
 
-        // 6. COMMONPLACE DATA HANDLERS
+        // 4. ANTHOLOGIA DATABASE SYSTEM
         function saveQuote(text, author, source) {
             let quotes = JSON.parse(localStorage.getItem('almanac_quotes') || '[]');
             quotes.unshift({ id: Date.now(), text, author: author || 'Unknown', source: source || 'Handcrafted Entry' });
@@ -200,16 +250,16 @@
             const quotes = JSON.parse(localStorage.getItem('almanac_quotes') || '[]');
             
             if (quotes.length === 0) {
-                container.innerHTML = `<div class="text-center py-12 text-sm text-stone-400 italic">Your commonplace ledger is empty. Tap highlights inside daily stories or append entries manually.</div>`;
+                container.innerHTML = `<div class="text-center py-12 text-sm text-stone-400 italic">Your Anthologia database layer is empty. Highlight text slices or append manual modules.</div>`;
                 return;
             }
 
             container.innerHTML = quotes.map(q => `
-                <div class="bg-white border border-stone-200/80 p-4 rounded-xl space-y-2 relative shadow-2xs group">
+                <div class="bg-white border border-stone-200/80 p-4 rounded-xl space-y-2 relative shadow-2xs">
                     <p class="literary-text text-stone-800 text-base italic">"${q.text}"</p>
-                    <div class="text-xs text-stone-400 flex justify-between">
+                    <div class="text-xs text-stone-400 flex justify-between items-center">
                         <span>— ${q.author}, <span class="underline decoration-stone-200">${q.source}</span></span>
-                        <button onclick="deleteQuote(${q.id})" class="text-stone-300 hover:text-rose-600 font-medium transition cursor-pointer">Delete</button>
+                        <button onclick="deleteQuote(${q.id})" class="text-stone-300 hover:text-rose-600 font-medium transition-colors cursor-pointer p-1">Delete</button>
                     </div>
                 </div>
             `).join('');
@@ -222,9 +272,7 @@
             renderCommonplace();
         }
 
-        // 7. MANUAL ENTRY MODAL FUNCTIONS
         function openQuoteModal() { document.getElementById('quote-modal').classList.replace('hidden', 'flex'); }
-        document.getElementById('quote-modal').addEventListener('click', (e) => { if(e.target.id==='quote-modal') closeQuoteModal(); });
         function closeQuoteModal() {
             document.getElementById('quote-modal').classList.replace('flex', 'hidden');
             document.getElementById('modal-quote-text').value = '';
@@ -235,12 +283,12 @@
             const txt = document.getElementById('modal-quote-text').value.trim();
             const aut = document.getElementById('modal-quote-author').value.trim();
             const src = document.getElementById('modal-quote-source').value.trim();
-            if(!txt) return alert("Fragment content is blank.");
+            if(!txt) return alert("Content frame cannot be blank.");
             saveQuote(txt, aut, src);
             closeQuoteModal();
         }
 
-        // 8. ATELIER EDITOR WRITING ENGINE
+        // 5. ATELIER DRAFT WRITING MACHINE
         function createNewDraft() {
             let drafts = JSON.parse(localStorage.getItem('almanac_drafts') || '[]');
             const newPiece = { id: Date.now(), title: '', content: '', updated: Date.now() };
@@ -265,7 +313,7 @@
         function saveCurrentPiece() {
             if (!currentPieceId) return;
             const statusNode = document.getElementById('save-status');
-            statusNode.innerText = "Saving changes...";
+            statusNode.innerText = "Syncing desk changes...";
             
             let drafts = JSON.parse(localStorage.getItem('almanac_drafts') || '[]');
             const idx = drafts.findIndex(d => d.id === currentPieceId);
@@ -291,23 +339,23 @@
             const drafts = JSON.parse(localStorage.getItem('almanac_drafts') || '[]');
             
             if (drafts.length === 0) {
-                container.innerHTML = `<div class="text-center py-8 text-xs text-stone-400 italic">No manuscript pages found. Tap '+ New Piece' to create one.</div>`;
+                container.innerHTML = `<div class="text-center py-8 text-xs text-stone-400 italic">Atelier script roster is empty. Tap '+ New Manuscript' to instantiate.</div>`;
                 return;
             }
 
             container.innerHTML = drafts.map(d => `
                 <div class="bg-white border border-stone-200 rounded-lg p-3 flex justify-between items-center shadow-2xs">
                     <div onclick="openEditor(${d.id})" class="flex-grow cursor-pointer pr-4">
-                        <h4 class="font-medium text-stone-800 text-sm">${d.title.trim() || '<Untitled Draft>'}</h4>
-                        <p class="text-[11px] text-stone-400">Modified: ${new Date(d.updated).toLocaleDateString()}</p>
+                        <h4 class="font-medium text-stone-800 text-sm">${d.title.trim() || '&lt;Untitled Manuscript&gt;'}</h4>
+                        <p class="text-[11px] text-stone-400">Restructured: ${new Date(d.updated).toLocaleDateString()}</p>
                     </div>
-                    <button onclick="deleteDraft(${d.id})" class="text-stone-300 hover:text-rose-600 text-xs px-2 py-1 transition cursor-pointer">Discard</button>
+                    <button onclick="deleteDraft(${d.id})" class="text-stone-300 hover:text-rose-600 text-xs px-2 py-1 transition-colors cursor-pointer">Discard</button>
                 </div>
             `).join('');
         }
 
         function deleteDraft(id) {
-            if(confirm("Permanently discard this draft? This action cannot be undone.")) {
+            if(confirm("Confirm deletion of file tracking index? Data recovery cannot be invoked.")) {
                 let drafts = JSON.parse(localStorage.getItem('almanac_drafts') || '[]');
                 drafts = drafts.filter(d => d.id !== id);
                 localStorage.setItem('almanac_drafts', JSON.stringify(drafts));
@@ -315,7 +363,7 @@
             }
         }
 
-        // 9. LEDGER PORTABILITY SYSTEM (BACKUPS)
+        // 6. BACKUP FILE MANAGEMENT
         function exportBackup() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({
                 quotes: JSON.parse(localStorage.getItem('almanac_quotes') || '[]'),
@@ -338,38 +386,66 @@
                     const parsed = JSON.parse(e.target.result);
                     if(parsed.quotes) localStorage.setItem('almanac_quotes', JSON.stringify(parsed.quotes));
                     if(parsed.drafts) localStorage.setItem('almanac_drafts', JSON.stringify(parsed.drafts));
-                    alert("Ledger successfully imported!");
+                    alert("Data elements appended successfully.");
                     renderCommonplace();
                     renderDrafts();
                 } catch(err) {
-                    alert("Error parsing backup data file.");
+                    alert("Failure parsing validation tokens.");
                 }
             };
             reader.readAsText(file);
         }
+
+        // 7. PWA INSTALLED CAPABILITY LAYER
+        function setupPWAInstallTracking() {
+            window.addEventListener('beforeinstallprompt', (e) => {
+                // Intercept automatic prompt tracking sequences
+                e.preventDefault();
+                deferredPrompt = e;
+                // Reveal manual app installation visual notice
+                document.getElementById('install-banner').classList.replace('hidden', 'flex');
+            });
+
+            // Catch cases where users successfully installed via alternate navigation nodes
+            window.addEventListener('appinstalled', () => {
+                document.getElementById('install-banner').classList.replace('flex', 'hidden');
+                deferredPrompt = null;
+            });
+        }
+
+        function triggerInstall() {
+            if (!deferredPrompt) return;
+            document.getElementById('install-banner').classList.replace('flex', 'hidden');
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
+        }
+
+        function dismissInstall() {
+            document.getElementById('install-banner').classList.replace('flex', 'hidden');
+        }
     </script>
 
-    <!-- INLINE ZERO-CONFIG SERVICE WORKER REGISTER -->
+    <!-- INLINE AUTO-CONFIG SYSTEM FOR PWA STANDALONE CAPABILITIES -->
     <script>
         if ('serviceWorker' in navigator) {
             const swCode = `
-                const CACHE_NAME = 'almanac-v1';
-                const ASSETS = [
+                const CACHE_NAME = 'almanac-engine-v2';
+                const IMPORTS = [
                     './',
                     './index.html',
                     './manifest.json',
                     'https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4'
                 ];
                 self.addEventListener('install', e => {
-                    e.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS)));
+                    e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(IMPORTS)));
                 });
                 self.addEventListener('fetch', e => {
-                    e.respondWith(caches.match(e.request).then(res => res || fetch(e.request)));
+                    e.respondWith(caches.match(e.request).then(response => response || fetch(e.request)));
                 });
             `;
             const blob = new Blob([swCode], { type: 'application/javascript' });
             const swUrl = URL.createObjectURL(blob);
-            navigator.serviceWorker.register(swUrl).catch(err => console.log("SW bypass registration configuration", err));
+            navigator.serviceWorker.register(swUrl).catch(err => console.log("Sandbox config pass", err));
         }
     </script>
 </body>

@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Scribbler's Almanac</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1e293b">
+    <!-- Tailwind CSS for clean layout -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Google Fonts for premium literary typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Plus+Jakarta+Sans:wght@400;500;600&workspace=copy" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #fbfbfa; color: #2d2d2a; }
+        .serif-title { font-family: 'Cinzel', serif; }
+        .literary-text { font-family: 'Playfair Display', serif; line-height: 1.8; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col max-w-2xl mx-auto px-4 py-6 selection:bg-amber-200">
+
+    <!-- Header Navigation -->
+    <header class="flex justify-between items-center border-b border-stone-200 pb-4 mb-6">
+        <h1 class="serif-title text-xl font-semibold tracking-wide text-stone-800">The Almanac</h1>
+        <nav class="flex gap-4 text-sm font-medium text-stone-500">
+            <button onclick="switchTab('dispensary')" id="tab-dispensary" class="text-amber-700 font-semibold border-b-2 border-amber-700 pb-1 cursor-pointer">Read</button>
+            <button onclick="switchTab('anthologia')" id="tab-anthologia" class="hover:text-stone-800 pb-1 cursor-pointer">Commonplace</button>
+            <button onclick="switchTab('atelier')" id="tab-atelier" class="hover:text-stone-800 pb-1 cursor-pointer">Write</button>
+        </nav>
+    </header>
+
+    <!-- MAIN APP VIEWS -->
+    <main class="flex-grow">
+        
+        <!-- 1. THE DISPENSARY (DAILY READING) -->
+        <section id="view-dispensary" class="block space-y-6 animate-fade-in">
+            <div class="text-center space-y-2 py-4">
+                <span class="text-xs uppercase tracking-widest text-stone-400 font-semibold">Today's Selection</span>
+                <h2 id="story-title" class="literary-text text-3xl font-semibold text-stone-900">...</h2>
+                <p id="story-author" class="text-stone-500 italic text-sm">...</p>
+            </div>
+            
+            <div class="bg-amber-50/50 border border-amber-100 p-3 rounded-lg text-xs text-amber-800 text-center">
+                💡 <strong>Tip:</strong> Highlight any text inside the story below to clip it directly to your Commonplace book!
+            </div>
+
+            <article id="story-body" class="literary-text text-lg text-stone-800 space-y-6 text-justify whitespace-pre-wrap px-2 pb-12">
+                <!-- Content injected dynamically -->
+            </article>
+        </section>
+
+        <!-- 2. THE ANTHOLOGIA (COMMONPLACE BOOK) -->
+        <section id="view-anthologia" class="hidden space-y-6">
+            <div class="flex justify-between items-center">
+                <h2 class="serif-title text-lg font-semibold text-stone-800">Your Commonplace Book</h2>
+                <button onclick="openQuoteModal()" class="bg-stone-800 hover:bg-stone-700 text-white text-xs px-3 py-1.5 rounded-md cursor-pointer transition">Add Custom Fragment</button>
+            </div>
+            <div id="quotes-list" class="space-y-4">
+                <!-- Quotes dynamically populated -->
+            </div>
+        </section>
+
+        <!-- 3. THE ATELIER (CREATIVE WRITING EDITOR) -->
+        <section id="view-atelier" class="hidden space-y-4">
+            <div class="flex justify-between items-center">
+                <h2 class="serif-title text-lg font-semibold text-stone-800">The Atelier</h2>
+                <button onclick="createNewDraft()" class="bg-amber-700 hover:bg-amber-800 text-white text-xs px-3 py-1.5 rounded-md cursor-pointer transition">+ New Piece</button>
+            </div>
+
+            <!-- Editor Pane (Hidden until a piece is selected or created) -->
+            <div id="editor-pane" class="hidden space-y-4 border border-stone-200 bg-white p-4 rounded-xl shadow-xs">
+                <input type="text" id="editor-title" placeholder="Untitled Piece" class="w-full text-xl font-semibold border-b border-stone-100 pb-2 focus:outline-none focus:border-amber-600 font-sans" oninput="saveCurrentPiece()">
+                <textarea id="editor-content" placeholder="Begin writing your story or poem here..." class="w-full h-80 focus:outline-none resize-none field-sizing-content literary-text text-base" oninput="saveCurrentPiece()"></textarea>
+                <div class="flex justify-between items-center text-xs text-stone-400">
+                    <span id="save-status">All changes saved locally</span>
+                    <button onclick="closeEditor()" class="text-stone-500 hover:text-stone-800 font-medium">Close Editor</button>
+                </div>
+            </div>
+
+            <!-- Documents List -->
+            <div id="drafts-container" class="space-y-2">
+                <h3 class="text-xs font-semibold uppercase tracking-wider text-stone-400 mb-2">Your Manuscripts</h3>
+                <div id="drafts-list" class="space-y-2">
+                    <!-- Draft items populated here -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER MANAGEMENT (BACKUPS) -->
+    <footer class="mt-12 pt-4 border-t border-stone-200 flex justify-between text-[11px] text-stone-400">
+        <span>© The Scribbler's Almanac</span>
+        <div class="flex gap-3">
+            <button onclick="exportBackup()" class="hover:text-stone-700 cursor-pointer">Export Ledger JSON</button>
+            <label class="hover:text-stone-700 cursor-pointer">
+                Import Ledger <input type="file" id="import-file" class="hidden" onchange="importBackup(event)">
+            </label>
+        </div>
+    </footer>
+
+    <!-- ADD MANUALLY OVERLAY MODAL -->
+    <div id="quote-modal" class="fixed inset-0 bg-stone-900/40 backdrop-blur-xs hidden items-center justify-center p-4">
+        <div class="bg-white rounded-xl p-5 w-full max-w-md space-y-4 shadow-xl">
+            <h3 class="serif-title font-semibold text-stone-800">Log Fragment</h3>
+            <textarea id="modal-quote-text" placeholder="\"The fields are green, the sky is wide...\"" class="w-full h-24 border border-stone-200 p-2 rounded-md text-sm focus:outline-none focus:border-amber-600"></textarea>
+            <div class="grid grid-cols-2 gap-2">
+                <input type="text" id="modal-quote-author" placeholder="Author" class="border border-stone-200 p-2 rounded-md text-sm focus:outline-none focus:border-amber-600">
+                <input type="text" id="modal-quote-source" placeholder="Source / Book Title" class="border border-stone-200 p-2 rounded-md text-sm focus:outline-none focus:border-amber-600">
+            </div>
+            <div class="flex justify-end gap-2 text-xs font-medium pt-2">
+                <button onclick="closeQuoteModal()" class="px-3 py-2 bg-stone-100 rounded-md text-stone-600 hover:bg-stone-200 cursor-pointer">Cancel</button>
+                <button onclick="saveManualQuote()" class="px-3 py-2 bg-amber-700 text-white rounded-md hover:bg-amber-800 cursor-pointer">Save Entry</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- APPLICATION SCRIPTS & APPLICATION DATA -->
+    <script>
+        // 1. PUBLIC DOMAIN CURATED STORIES LIBRARIES
+        const ALMANAC_LIBRARY = [
+            {
+                id: 1,
+                title: "The Child's Story",
+                author: "Charles Dickens",
+                content: "Once upon a time, a good many years ago, there was a traveller, and he set out upon a journey. It was a magic journey, and was to seem very long when he began it, and very short when he got half way through.\n\nHe travelled along a rather dark path for some little time, without meeting anything, until at last he came to a beautiful child. So he said to the child, 'What do you do here?' And the child said, 'I am always at play. Come and play with me!'\n\nSo, he played with that child, the whole day long, and they were very merry. The sky was so blue, the sun was so bright, the water was so sparkling, the leaves were so green, the flowers were so lovely, and everything was so beautiful."
+            },
+            {
+                id: 2,
+                title: "Where the Mind is Without Fear",
+                author: "Rabindranath Tagore",
+                content: "Where the mind is without fear and the head is held high;\nWhere knowledge is free;\nWhere the world has not been broken up into fragments by narrow domestic walls;\nWhere words come out from the depth of truth;\nWhere tireless striving stretches its arms towards perfection;\nWhere the clear stream of reason has not lost its way into the dreary desert sand of dead habit;\nWhere the mind is led forward by thee into ever-widening thought and action;\nInto that heaven of freedom, my Father, let my country awake."
+            },
+            {
+                id: 3,
+                title: "The Tell-Tale Heart (Excerpt)",
+                author: "Edgar Allan Poe",
+                content: "TRUE!—nervous—very, very dreadfully nervous I had been and am; but why will you say that I am mad? The disease had sharpened my senses—not destroyed—not dulled them. Above all was the sense of hearing acute. I heard all things in the heaven and in the earth. I heard many things in hell. How, then, am I mad? Hearken! and observe how healthily—how calmly I can tell you the whole story."
+            }
+        ];
+
+        // 2. STATE ENGINE & INTIALIZATION
+        let currentPieceId = null;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initDailyReading();
+            renderCommonplace();
+            renderDrafts();
+            setupHighlightListener();
+        });
+
+        // 3. TAB NAVIGATION CONTROLLER
+        function switchTab(tabId) {
+            ['dispensary', 'anthologia', 'atelier'].forEach(id => {
+                document.getElementById(`view-${id}`).classList.add('hidden');
+                document.getElementById(`tab-${id}`).className = "hover:text-stone-800 pb-1 cursor-pointer";
+            });
+            document.getElementById(`view-${tabId}`).classList.remove('hidden');
+            document.getElementById(`tab-${tabId}`).className = "text-amber-700 font-semibold border-b-2 border-amber-700 pb-1 cursor-pointer";
+        }
+
+        // 4. LITERARY PIECE RELEASER (ROTATING DAILY)
+        function initDailyReading() {
+            const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 1)) / 86400000);
+            const selectedStory = ALMANAC_LIBRARY[dayOfYear % ALMANAC_LIBRARY.length];
+            
+            document.getElementById('story-title').innerText = selectedStory.title;
+            document.getElementById('story-author').innerText = `by ${selectedStory.author}`;
+            document.getElementById('story-body').innerText = selectedStory.content;
+            document.getElementById('story-body').dataset.storyTitle = selectedStory.title;
+            document.getElementById('story-body').dataset.storyAuthor = selectedStory.author;
+        }
+
+        // 5. HIGHLIGHT SELECTION INTERCEPTOR (COMMONPLACE MAKER)
+        function setupHighlightListener() {
+            document.getElementById('story-body').addEventListener('mouseup', () => {
+                const selectedText = window.getSelection().toString().trim();
+                if (selectedText.length > 5) {
+                    const author = document.getElementById('story-body').dataset.storyAuthor;
+                    const source = document.getElementById('story-body').dataset.storyTitle;
+                    
+                    if (confirm(`Add this fragment to your Commonplace book?\n\n"${selectedText.substring(0, 40)}..."`)) {
+                        saveQuote(selectedText, author, source);
+                        window.getSelection().removeAllRanges();
+                    }
+                }
+            });
+        }
+
+        // 6. COMMONPLACE DATA HANDLERS
+        function saveQuote(text, author, source) {
+            let quotes = JSON.parse(localStorage.getItem('almanac_quotes') || '[]');
+            quotes.unshift({ id: Date.now(), text, author: author || 'Unknown', source: source || 'Handcrafted Entry' });
+            localStorage.setItem('almanac_quotes', JSON.stringify(quotes));
+            renderCommonplace();
+        }
+
+        function renderCommonplace() {
+            const container = document.getElementById('quotes-list');
+            const quotes = JSON.parse(localStorage.getItem('almanac_quotes') || '[]');
+            
+            if (quotes.length === 0) {
+                container.innerHTML = `<div class="text-center py-12 text-sm text-stone-400 italic">Your commonplace ledger is empty. Tap highlights inside daily stories or append entries manually.</div>`;
+                return;
+            }
+
+            container.innerHTML = quotes.map(q => `
+                <div class="bg-white border border-stone-200/80 p-4 rounded-xl space-y-2 relative shadow-2xs group">
+                    <p class="literary-text text-stone-800 text-base italic">"${q.text}"</p>
+                    <div class="text-xs text-stone-400 flex justify-between">
+                        <span>— ${q.author}, <span class="underline decoration-stone-200">${q.source}</span></span>
+                        <button onclick="deleteQuote(${q.id})" class="text-stone-300 hover:text-rose-600 font-medium transition cursor-pointer">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function deleteQuote(id) {
+            let quotes = JSON.parse(localStorage.getItem('almanac_quotes') || '[]');
+            quotes = quotes.filter(q => q.id !== id);
+            localStorage.setItem('almanac_quotes', JSON.stringify(quotes));
+            renderCommonplace();
+        }
+
+        // 7. MANUAL ENTRY MODAL FUNCTIONS
+        function openQuoteModal() { document.getElementById('quote-modal').classList.replace('hidden', 'flex'); }
+        document.getElementById('quote-modal').addEventListener('click', (e) => { if(e.target.id==='quote-modal') closeQuoteModal(); });
+        function closeQuoteModal() {
+            document.getElementById('quote-modal').classList.replace('flex', 'hidden');
+            document.getElementById('modal-quote-text').value = '';
+            document.getElementById('modal-quote-author').value = '';
+            document.getElementById('modal-quote-source').value = '';
+        }
+        function saveManualQuote() {
+            const txt = document.getElementById('modal-quote-text').value.trim();
+            const aut = document.getElementById('modal-quote-author').value.trim();
+            const src = document.getElementById('modal-quote-source').value.trim();
+            if(!txt) return alert("Fragment content is blank.");
+            saveQuote(txt, aut, src);
+            closeQuoteModal();
+        }
+
+        // 8. ATELIER EDITOR WRITING ENGINE
+        function createNewDraft() {
+            let drafts = JSON.parse(localStorage.getItem('almanac_drafts') || '[]');
+            const newPiece = { id: Date.now(), title: '', content: '', updated: Date.now() };
+            drafts.unshift(newPiece);
+            localStorage.setItem('almanac_drafts', JSON.stringify(drafts));
+            openEditor(newPiece.id);
+        }
+
+        function openEditor(id) {
+            currentPieceId = id;
+            let drafts = JSON.parse(localStorage.getItem('almanac_drafts') || '[]');
+            const piece = drafts.find(d => d.id === id);
+            
+            if (piece) {
+                document.getElementById('editor-title').value = piece.title;
+                document.getElementById('editor-content').value = piece.content;
+                document.getElementById('editor-pane').classList.remove('hidden');
+                document.getElementById('drafts-container').classList.add('hidden');
+            }
+        }
+
+        function saveCurrentPiece() {
+            if (!currentPieceId) return;
+            const statusNode = document.getElementById('save-status');
+            statusNode.innerText = "Saving changes...";
+            
+            let drafts = JSON.parse(localStorage.getItem('almanac_drafts') || '[]');
+            const idx = drafts.findIndex(d => d.id === currentPieceId);
+            
+            if (idx !== -1) {
+                drafts[idx].title = document.getElementById('editor-title').value;
+                drafts[idx].content = document.getElementById('editor-content').value;
+                drafts[idx].updated = Date.now();
+                localStorage.setItem('almanac_drafts', JSON.stringify(drafts));
+                setTimeout(() => { statusNode.innerText = "Saved locally ✓"; }, 300);
+            }
+        }
+
+        function closeEditor() {
+            currentPieceId = null;
+            document.getElementById('editor-pane').classList.add('hidden');
+            document.getElementById('drafts-container').classList.remove('hidden');
+            renderDrafts();
+        }
+
+        function renderDrafts() {
+            const container = document.getElementById('drafts-list');
+            const drafts = JSON.parse(localStorage.getItem('almanac_drafts') || '[]');
+            
+            if (drafts.length === 0) {
+                container.innerHTML = `<div class="text-center py-8 text-xs text-stone-400 italic">No manuscript pages found. Tap '+ New Piece' to create one.</div>`;
+                return;
+            }
+
+            container.innerHTML = drafts.map(d => `
+                <div class="bg-white border border-stone-200 rounded-lg p-3 flex justify-between items-center shadow-2xs">
+                    <div onclick="openEditor(${d.id})" class="flex-grow cursor-pointer pr-4">
+                        <h4 class="font-medium text-stone-800 text-sm">${d.title.trim() || '<Untitled Draft>'}</h4>
+                        <p class="text-[11px] text-stone-400">Modified: ${new Date(d.updated).toLocaleDateString()}</p>
+                    </div>
+                    <button onclick="deleteDraft(${d.id})" class="text-stone-300 hover:text-rose-600 text-xs px-2 py-1 transition cursor-pointer">Discard</button>
+                </div>
+            `).join('');
+        }
+
+        function deleteDraft(id) {
+            if(confirm("Permanently discard this draft? This action cannot be undone.")) {
+                let drafts = JSON.parse(localStorage.getItem('almanac_drafts') || '[]');
+                drafts = drafts.filter(d => d.id !== id);
+                localStorage.setItem('almanac_drafts', JSON.stringify(drafts));
+                renderDrafts();
+            }
+        }
+
+        // 9. LEDGER PORTABILITY SYSTEM (BACKUPS)
+        function exportBackup() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({
+                quotes: JSON.parse(localStorage.getItem('almanac_quotes') || '[]'),
+                drafts: JSON.parse(localStorage.getItem('almanac_drafts') || '[]')
+            }));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `almanac_ledger_${new Date().toISOString().slice(0,10)}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        function importBackup(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    if(parsed.quotes) localStorage.setItem('almanac_quotes', JSON.stringify(parsed.quotes));
+                    if(parsed.drafts) localStorage.setItem('almanac_drafts', JSON.stringify(parsed.drafts));
+                    alert("Ledger successfully imported!");
+                    renderCommonplace();
+                    renderDrafts();
+                } catch(err) {
+                    alert("Error parsing backup data file.");
+                }
+            };
+            reader.readAsText(file);
+        }
+    </script>
+
+    <!-- INLINE ZERO-CONFIG SERVICE WORKER REGISTER -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            const swCode = `
+                const CACHE_NAME = 'almanac-v1';
+                const ASSETS = [
+                    './',
+                    './index.html',
+                    './manifest.json',
+                    'https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4'
+                ];
+                self.addEventListener('install', e => {
+                    e.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS)));
+                });
+                self.addEventListener('fetch', e => {
+                    e.respondWith(caches.match(e.request).then(res => res || fetch(e.request)));
+                });
+            `;
+            const blob = new Blob([swCode], { type: 'application/javascript' });
+            const swUrl = URL.createObjectURL(blob);
+            navigator.serviceWorker.register(swUrl).catch(err => console.log("SW bypass registration configuration", err));
+        }
+    </script>
+</body>
+</html>

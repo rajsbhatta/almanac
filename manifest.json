@@ -10,12 +10,12 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "https://img.icons8.com/fluency-solid/192/focal-length.png",
+      "src": "https://img.icons8.com/search.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "https://img.icons8.com/fluency-solid/512/focal-length.png",
+      "src": "https://img.icons8.com/search.png",
       "type": "image/png",
       "sizes": "512x512"
     }

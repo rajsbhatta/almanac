@@ -1,14 +1,27 @@
-{
-  "api_configuration": {
-    "base_url": "https://gutendex.com/books/",
-    "default_topic": "short stories",
-    "language": "en"
+[
+  {
+    "title": "The Child's Story (Part I: The Grand Journey)",
+    "author": "Charles Dickens",
+    "content": "Once upon a time, a good many years ago, there was a traveller, and he set out upon a journey. It was a magic journey, and was to seem very long when he began it, and very short when he got half way through. He travelled along a rather dark path for some little time, without meeting anything, until at last he came to a beautiful child. So he said to the child, 'What do you do here?' And the child said, 'I am always at play. Come and play with me!' So, he played with that child, the whole day long, and they were very merry."
   },
-  "featured_story_ids": [
-    11,
-    84,
-    46,
-    25344,
-    1342
-  ]
-}
+  {
+    "title": "The Child's Story (Part II: The Garden of Youth)",
+    "author": "Charles Dickens",
+    "content": "The sky was so blue, the sun was so bright, the water was so sparkling, the leaves were so green, the flowers were so lovely, and everything was so beautiful. This was the long, golden morning of the trip. But soon the child vanished, and the traveller went on his path until he overtook a young man. 'What do you do here?' asked the traveller. And the young man said, 'I am always in love. Come and love with me!' So they walked together through a deep forest where the sun shone like gold through the leaves."
+  },
+  {
+    "title": "The Child's Story (Part III: The Autumnal Ridge)",
+    "author": "Charles Dickens",
+    "content": "They walked along together for a long time, but at last the young man vanished too, and the traveller went on until he came to a middle-aged gentleman who was sitting by a fire. 'What do you do here?' asked the traveller. 'I am always busy,' said the gentleman. 'Come and be busy with me!' So he stayed with him, working and planning, until the leaves turned brown and began to fall from the trees. At last, the fire flickered out, the busy gentleman was gone, and the traveller found himself approaching the quiet, starlit end of his trail."
+  },
+  {
+    "title": "Where the Mind is Without Fear",
+    "author": "Rabindranath Tagore",
+    "content": "Where the mind is without fear and the head is held high;\nWhere knowledge is free;\nWhere the world has not been broken up into fragments by narrow domestic walls;\nWhere words come out from the depth of truth;\nWhere tireless striving stretches its arms towards perfection;\nWhere the clear stream of reason has not lost its way into the dreary desert sand of dead habit;\nWhere the mind is led forward by thee into ever-widening thought and action;\nInto that heaven of freedom, my Father, let my country awake."
+  },
+  {
+    "title": "The Three Questions (Excerpt)",
+    "author": "Leo Tolstoy",
+    "content": "It once occurred to a certain king, that if he always knew the right time to begin everything; if he knew who were the right people to listen to, and whom to avoid; and, above all, if he always knew what was the most important thing to do, he would never fail in anything he might undertake. And this thought having occurred to him, he had it proclaimed throughout his kingdom that he would give a great reward to anyone who would teach him what was the right time for every action, and who were the most necessary people, and how he might know what was the most important thing to do."
+  }
+]
